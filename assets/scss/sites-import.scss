@@ -1,0 +1,148 @@
+.suki-sites-import-wrap {
+	.wp-filter:empty {
+		display: none;
+	}
+
+	.suki-sites-import-filters-left {
+		float: left;
+	}
+
+	.suki-sites-import-filters-right {
+		float: right;
+	}
+
+	.suki-sites-import-select-builder {
+		position: relative;
+		text-align: left;
+		padding: 0 0 0 3.5em;
+
+		&:before {
+			content: "👆";
+			position: absolute;
+			top: 50%;
+			left: 0;
+			font-size: 2em;
+			line-height: 1;
+			margin: -0.5em 0 0 0.5em;
+			animation: suki-sites-import-select-builder 1s infinite;
+		}
+
+		@keyframes suki-sites-import-select-builder {
+			0% {
+				transform: translate( 0, 0 );
+			}
+			50% {
+				transform: translate( 0, -25% );
+			}
+		}
+	}
+
+	.search-form {
+		margin-left: 10px;
+	}
+
+	.suki-sites-import-badge {
+		float: right;
+		display: inline-block;
+		padding: 0.3em 0.6em;
+		font-size: 0.8em;
+		line-height: 1;
+		text-transform: uppercase;
+	}
+
+	.suki-sites-import-badge-1 {
+		background-color: #ee5253;
+		color: #fff;
+	}
+
+	.suki-sites-import-preview {
+		display: block;
+
+		.wp-full-overlay-sidebar-content {
+			bottom: 76px;
+		}
+
+		.theme-name {
+			font-size: 22px;
+			line-height: 32px;
+		}
+
+		.suki-sites-import-preview-required-plugins {
+			h4 {
+				font-size: 16px;
+				line-height: 24px;
+				margin: 30px 0 15px;
+			}
+
+			ul {
+				margin: 0;
+
+				li {
+					display: flex;
+					justify-content: space-between;
+					align-items: flex-start;
+					margin: 10px 0;
+
+					span {
+						display: inline-block;
+						padding: 6px 0;
+						margin-right: 10px;
+					}
+
+					.button {
+						text-align: center;
+
+						&.button-link {
+							text-decoration: none;
+							background-color: transparent !important;
+						}
+
+						img {
+							display: inline-block;
+							width: 20px;
+							height: 20px;
+							vertical-align: top;
+							margin-top: 3px;
+							opacity: 0.5;
+						}
+					}
+				}
+			}
+		}
+
+		.wp-full-overlay-footer {
+			height: 76px;
+		}
+
+		.suki-sites-import-preview-notice {
+			margin-top: 1.5em;
+		}
+
+		.suki-sites-import-preview-actions {
+			padding: 15px 20px;
+
+			.button {
+				display: block;
+				text-align: center;
+				width: 100%;
+
+				&.installing,
+				&.updated-message {
+					&:before {
+						margin: 10px 10px 0 -10px;
+						color: inherit;
+						font-size: 24px;
+					}
+				}
+
+				img {
+					display: inline-block;
+					width: 20px;
+					height: 20px;
+					vertical-align: middle;
+					opacity: 0.5;
+				}
+			}
+		}
+	}
+}
