@@ -224,6 +224,9 @@
 				return;
 			}
 
+			var log = 'Installing plugin: ' + plugin.name;
+			console.log( log );
+
 			var $otherButtons = SukiSitesImport.$currentPreview.find( '.suki-sites-import-preview-required-plugin-button' ).not( '[data-slug="' + plugin.slug + '"]' );
 
 			$otherButtons.prop( 'disabled', true );
@@ -258,6 +261,9 @@
 				alert( SukiSitesImportScriptsData.strings.plugin_error_invalid );
 				return;
 			}
+
+			var log = 'Activating plugin: ' + plugin.name;
+			console.log( log );
 
 			var $otherButtons = SukiSitesImport.$currentPreview.find( '.suki-sites-import-preview-required-plugin-button' ).not( '[data-slug="' + plugin.slug + '"]' );
 
