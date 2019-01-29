@@ -70,6 +70,7 @@ class Suki_Sites_Import {
 		// Suki theme is installed.
 		if ( defined( 'SUKI_VERSION' ) ) {
 			add_action( 'upload_mimes', array( $this, 'allow_upload_xml' ) );
+			add_filter( 'wp_check_filetype_and_ext', array( $this, 'real_mime_type_for_xml' ), 10, 4 );
 
 			add_action( 'suki/admin/menu', array( $this, 'register_admin_menu' ) );
 			add_action( 'suki/admin/after_enqueue_admin_js', array( $this, 'enqueue_scripts' ) );
@@ -82,6 +83,10 @@ class Suki_Sites_Import {
 			add_action( 'wp_ajax_suki_sites_import__import_customizer', array( $this, 'ajax_import_customizer' ) );
 			add_action( 'wp_ajax_suki_sites_import__import_widgets', array( $this, 'ajax_import_widgets' ) );
 			add_action( 'wp_ajax_suki_sites_import__import_options', array( $this, 'ajax_import_options' ) );
+
+			if ( class_exists( 'WooCommerce' ) ) {
+				require_once( SUKI_SITES_IMPORT_DIR . 'inc/compatibilities/class-suki-sites-import-compatibility-woocommerce.php' );
+			}
 		}
 
 		// Suki theme is not installed.
@@ -99,6 +104,23 @@ class Suki_Sites_Import {
 		$mimes = array_merge( $mimes, array( 'xml' => 'text/xml' ) );
 
 		return $mimes;
+	}
+
+	/**
+	 * Filters the "real" file type of the given file.
+	 *
+	 * @param array $wp_check_filetype_and_ext
+	 * @param string $file
+	 * @param string $filename
+	 * @param array $mimes
+	 */
+	public function real_mime_type_for_xml( $wp_check_filetype_and_ext, $file, $filename, $mimes ) {
+		if ( '.xml' === substr( $filename, -4 ) ) {
+			$wp_check_filetype_and_ext['ext'] = 'xml';
+			$wp_check_filetype_and_ext['type'] = 'text/xml';
+		}
+
+		return $wp_check_filetype_and_ext;
 	}
 
 	/**
@@ -271,7 +293,7 @@ class Suki_Sites_Import {
 		check_ajax_referer( 'suki-sites-import', '_ajax_nonce' );
 
 		if ( ! current_user_can( 'install_plugins' ) || ! isset( $_REQUEST['contents_xml_file_url'] ) ) {
-			wp_send_json_error();
+			wp_send_json_error( esc_html__( 'You are not permitted to install plugins.', 'suki-sites-import' ) );
 		}
 		
 		/**
@@ -315,6 +337,10 @@ class Suki_Sites_Import {
 			// A properly uploaded file will pass this test.
 			// There should be no reason to override this one.
 			'test_upload' => true,
+
+			'mimes'       => array(
+				'xml' => 'text/xml',
+			),
 		);
 
 		// Move the temporary file into the uploads directory.
@@ -402,6 +428,12 @@ class Suki_Sites_Import {
 		}
 
 		/**
+		 * Action hook.
+		 */
+
+		do_action( 'suki/sites_import/after_import_contents' );
+
+		/**
 		 * Return successful AJAX.
 		 */
 
@@ -441,6 +473,12 @@ class Suki_Sites_Import {
 		 */
 
 		update_option( 'theme_mods_' . get_stylesheet(), $array );
+
+		/**
+		 * Action hook.
+		 */
+
+		do_action( 'suki/sites_import/after_import_customizer', $array );
 
 		/**
 		 * Return successful AJAX.
@@ -547,6 +585,11 @@ class Suki_Sites_Import {
 			update_option( 'widget_' . $widget_slug, $instances );
 		}
 
+		/**
+		 * Action hook.
+		 */
+
+		do_action( 'suki/sites_import/after_import_widgets', $sidebar_widgets, $widget_instances );
 
 		/**
 		 * Return successful AJAX.
@@ -588,8 +631,20 @@ class Suki_Sites_Import {
 		 */
 
 		foreach ( $array as $key => $value ) {
+			// Skip option key with "__" prefix, because it will be treated specifically via the action hook.
+			if ( '__' === substr( $key, 0, 2 ) ) {
+				continue;	
+			}
+
+			// Insert to options table.
 			update_option( $key, $value );
 		}
+
+		/**
+		 * Action hook.
+		 */
+
+		do_action( 'suki/sites_import/after_import_options', $array );
 
 		/**
 		 * Return successful AJAX.
@@ -617,10 +672,10 @@ class Suki_Sites_Import {
 				$theme = wp_get_theme( 'suki' );
 				if ( $theme->exists() ) {
 					$url = esc_url( add_query_arg( 'theme', 'suki', admin_url( 'themes.php' ) ) );
-					$label = esc_html__( 'Activate Now', 'suki-pro' );
+					$label = esc_html__( 'Activate Now', 'suki-sites-import' );
 				} else {
 					$url = esc_url( add_query_arg( 'search', 'suki', admin_url( 'theme-install.php' ) ) );
-					$label = esc_html__( 'Install and Activate Now', 'suki-pro' );
+					$label = esc_html__( 'Install and Activate Now', 'suki-sites-import' );
 				}
 				
 				echo '&nbsp;&nbsp;<a class="button button-secondary" href="' . $url . '" style="margin: -0.5em 0;">' . $label . '</a>'; // WPCS: XSS OK.
@@ -683,8 +738,8 @@ class Suki_Sites_Import {
 						<div class="theme-id-container">
 							<h3 class="theme-name">
 								{{{ item.name }}}
-								<# if ( 0 < item.license_plan ) { #>
-									<span class="suki-sites-import-badge suki-sites-import-badge-{{ item.license_plan }}">{{{ item.license_plan_label }}}</span>
+								<# if ( 0 < item.license_plan.id ) { #>
+									<span class="suki-sites-import-badge suki-sites-import-badge-{{ item.license_plan.id }}">{{{ item.license_plan.name }}}</span>
 								<# } #>
 							</h3>
 						</div>
@@ -724,7 +779,7 @@ class Suki_Sites_Import {
 								case 'require_higher_license_plan':
 									#>
 									<div class="suki-sites-import-preview-notice notice inline notice-alt notice-warning">
-										<p><?php esc_html_e( 'To import this site you need an active license of {{ data.license_plan_label }} plan. Please upgrade or renew your expired license, and then activate your license on "Appearance > Suki" page.', 'suki-sites-import' ); ?></p>
+										<p><?php esc_html_e( 'To import this site you need an active license of {{ data.license_plan.name }} plan. Please upgrade or renew your expired license, and then activate your license on "Appearance > Suki" page.', 'suki-sites-import' ); ?></p>
 									</div>
 									<#
 									break;
