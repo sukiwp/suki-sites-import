@@ -4,8 +4,8 @@
 	"description": "Companion plugin for Suki theme to browse collections of demo sites and import them into your fresh site in one click.",
 	"uri": "http://wordpress.org/plugins/suki-sites-import",
 	"author": {
-		"name": "SukiWP",
-		"url": "https://sukiwp.com/about/"
+		"name": "Suki WordPress Theme",
+		"url": "https://sukiwp.com/#about"
 	},
 	"version": "1.0.0-dev",
 	"license": "GPL-2.0-or-later",

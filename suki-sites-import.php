@@ -4,8 +4,8 @@ Plugin Name: Suki Sites Import
 Plugin URI: http://wordpress.org/plugins/suki-sites-import
 Description: Companion plugin for Suki theme to browse collections of demo sites and import them into your fresh site in one click.
 Version: 1.0.0-dev
-Author: SukiWP
-Author URI: https://sukiwp.com/about/
+Author: Suki WordPress Theme
+Author URI: https://sukiwp.com/#about
 License: GNU General Public License v2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: suki-sites-import
