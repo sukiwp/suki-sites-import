@@ -11,6 +11,21 @@
 
 		$container: $( '.suki-sites-import-wrap' ),
 
+		$filters: $( '.suki-sites-import-wrap .wp-filter' ),
+
+		$browser: $( '.suki-sites-import-wrap .theme-browser' ),
+
+		$grid: $( '.suki-sites-import-wrap .themes' ),
+		
+		templates: {
+			selectBuilder: wp.template( 'suki-sites-import-select-builder' ),
+			filters: wp.template( 'suki-sites-import-filters' ),
+			gridItems: wp.template( 'suki-sites-import-grid-items' ),
+			noSiteFound: wp.template( 'suki-sites-import-no-site-found' ),
+			preview: wp.template( 'suki-sites-import-preview' ),
+			loadMore: wp.template( 'suki-sites-import-load-more' ),
+		},
+
 		/**
 		 * ====================================================
 		 * Core functions
@@ -29,6 +44,7 @@
 			SukiSitesImport.$container.on( 'click', '.wp-filter .suki-sites-import-categories-filter a', SukiSitesImport.clickCategoryFilter );
 			SukiSitesImport.$container.on( 'keyup', '.wp-filter .wp-filter-search', SukiSitesImport.submitSearchFilter );
 
+			SukiSitesImport.$container.on( 'click', '.suki-sites-import-load-more button', SukiSitesImport.clickLoadMore );
 			SukiSitesImport.$container.on( 'click', '.theme-screenshot, .more-details', SukiSitesImport.openSitePreview );
 			SukiSitesImport.$container.on( 'click', '.close-full-overlay', SukiSitesImport.closeSitePreview );
 
@@ -50,10 +66,7 @@
 				cache: false,
 			})
 			.done(function( response, status, XHR ) {
-				var $filters = SukiSitesImport.$container.find( '.wp-filter' ),
-					template = wp.template( 'suki-sites-import-filters' );
-
-				$filters.append( template( response ) );
+				SukiSitesImport.$filters.append( SukiSitesImport.templates.filters( response ) );
 
 				$( 'body' ).removeClass( 'loading-content' );
 
@@ -62,27 +75,33 @@
 		},
 
 		showBuilderSelector: function() {
-			SukiSitesImport.$container.find( '.theme-browser' ).html( wp.template( 'suki-sites-import-select-builder' ) );
+			SukiSitesImport.$grid.html( SukiSitesImport.templates.selectBuilder() );
 		},
 
 		resetSitesGrid: function() {
-			var $sites = SukiSitesImport.$container.find( '.theme-browser' );
-
-			$sites.empty();
+			SukiSitesImport.$grid.empty();
 		},
 
-		loadSitesGrid: function() {
-			SukiSitesImport.resetSitesGrid();
-
+		loadSitesGrid: function( isReset ) {
 			$( 'body' ).addClass( 'loading-content' );
+
+			if ( isReset ) {
+				SukiSitesImport.resetSitesGrid();
+			}
 
 			var args = $.extend({
 				builder: null,
 				category: null,
 				search: null,
 				page: 1,
+				per_page: 15,
 				license_key: SukiSitesImportScriptsData.license_key,
 			}, SukiSitesImport.currentGridFilters );
+
+			var $loadMoreButton = SukiSitesImport.$container.find( '.suki-sites-import-load-more' );
+			if ( 0 < $loadMoreButton.length ) {
+				$loadMoreButton.remove();
+			}
 
 			var queryString = '';
 			$.each( args, function( key, value ) {
@@ -92,22 +111,26 @@
 			});
 			queryString = queryString.replace( '&', '?' );
 
+			var $loadMoreButton = SukiSitesImport.$browser.find( '.suki-sites-load-more' );
+			if ( 0 < $loadMoreButton.length ) {
+				$loadMoreButton.remove();
+			}
+
 			$.ajax({
 				method: 'GET',
 				url: SukiSitesImportScriptsData.api_url + 'sites/' + queryString,
 				cache: false,
 			})
 			.done(function( response, status, XHR ) {
-				var $sites = SukiSitesImport.$container.find( '.theme-browser' ),
-				    template;
+				SukiSitesImport.$grid.append( SukiSitesImport.templates.gridItems( response ) );
 
 				if ( 0 < response.length ) {
-					template = wp.template( 'suki-sites-import-grid' );			
+					SukiSitesImport.$browser.append( SukiSitesImport.templates.loadMore() );
 				} else {
-					template = wp.template( 'suki-sites-import-no-site-found' );
+					if ( isReset ) {
+						SukiSitesImport.$grid.append( SukiSitesImport.templates.noSiteFound() );
+					}
 				}
-
-				$sites.html( template( response ) );
 
 				$( 'body' ).removeClass( 'loading-content' );
 			});
@@ -453,7 +476,7 @@
 
 			var $link = $( this ),
 			    $filterLinks = $( '.suki-sites-import-builders-filter a' ),
-			    builder = $link.attr( 'data-id' );
+			    builder = parseInt( $link.attr( 'data-id' ) );
 
 			if ( $link.hasClass( 'current' ) ) {
 				return;
@@ -463,8 +486,9 @@
 			$link.addClass( 'current' );
 
 			SukiSitesImport.currentGridFilters.builder = builder;
+			SukiSitesImport.currentGridFilters.page = 1;
 
-			SukiSitesImport.loadSitesGrid();
+			SukiSitesImport.loadSitesGrid( true );
 		},
 
 		clickCategoryFilter: function( event ) {
@@ -473,7 +497,7 @@
 			var $link = $( this ),
 			    $filterLinks = $( '.suki-sites-import-categories-filter a' ),
 			    $filterSearch = $( '.wp-filter-search' ),
-			    category = $link.attr( 'data-id' );
+			    category = parseInt( $link.attr( 'data-id' ) );
 
 			if ( $link.hasClass( 'current' ) ) {
 				return;
@@ -484,11 +508,16 @@
 
 			$filterSearch.val( '' );
 
-			SukiSitesImport.currentGridFilters.search = null;
-			SukiSitesImport.currentGridFilters.category = '-1' === category ? null : category;
+			delete SukiSitesImport.currentGridFilters.search;
+			if ( -1 === category ) {
+				delete SukiSitesImport.currentGridFilters.category;
+			} else {
+				SukiSitesImport.currentGridFilters.category = category;
+			}
+			SukiSitesImport.currentGridFilters.page = 1;
 
 			if ( undefined !== SukiSitesImport.currentGridFilters.builder ) {
-				SukiSitesImport.loadSitesGrid();
+				SukiSitesImport.loadSitesGrid( true );
 			}
 		},
 
@@ -504,24 +533,34 @@
 				SukiSitesImport.currentGridFilters.search = keywords;
 			} else {
 				$filterLinks.filter( '[data-id="-1"]' ).addClass( 'current' );
-				SukiSitesImport.currentGridFilters.search = null;
+				delete SukiSitesImport.currentGridFilters.search;
 			}
 
-			SukiSitesImport.currentGridFilters.category = null;
+			delete SukiSitesImport.currentGridFilters.category;
+			SukiSitesImport.currentGridFilters.page = 1;
 
 			if ( undefined !== SukiSitesImport.currentGridFilters.builder ) {
-				SukiSitesImport.loadSitesGrid();
+				SukiSitesImport.loadSitesGrid( true );
 			}
+		},
+
+		clickLoadMore: function( event ) {
+			event.preventDefault();
+
+			SukiSitesImport.currentGridFilters.page = SukiSitesImport.currentGridFilters.page + 1;
+
+			SukiSitesImport.$browser.find( '.suki-sites-load-more' ).remove();
+
+			SukiSitesImport.loadSitesGrid();
 		},
 
 		openSitePreview: function( event ) {
 			event.preventDefault();
 
 			var $item = $( this ).closest( '.theme' ),
-				data = JSON.parse( $item.attr( 'data-info' ) ),
-				template = wp.template( 'suki-sites-import-preview' );
+				data = JSON.parse( $item.attr( 'data-info' ) );
 
-			SukiSitesImport.$currentPreview = $( template( data ) );
+			SukiSitesImport.$currentPreview = $( SukiSitesImport.templates.preview( data ) );
 
 			SukiSitesImport.$container.append( SukiSitesImport.$currentPreview );
 

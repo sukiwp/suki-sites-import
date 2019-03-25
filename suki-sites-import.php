@@ -21,6 +21,8 @@ define( 'SUKI_SITES_IMPORT_DIR', plugin_dir_path( __FILE__ ) );
 
 define( 'SUKI_SITES_IMPORT_URI', plugins_url( '/', __FILE__ ) );
 
+define( 'SUKI_SITES_IMPORT_API_URL', 'https://demo.sukiwp.com/wp-json/suki/v1/' );
+
 if ( is_admin() ) {
 	require_once( SUKI_SITES_IMPORT_DIR . 'inc/class-suki-sites-import.php' );
 }

@@ -44,7 +44,7 @@ class Suki_Sites_Import {
 	 * Class constructor
 	 */
 	protected function __construct() {
-		self::$api_url = apply_filters( 'suki_sites_import_api_url', 'https://demo.sukiwp.com/wp-json/suki/v1/' );
+		self::$api_url = apply_filters( 'suki/sites_import/api_url', SUKI_SITES_IMPORT_API_URL );
 
 		add_action( 'plugins_loaded', array( $this, 'load_plugin_textdomain' ) );
 		add_action( 'after_setup_theme', array( $this, 'init' ) );
@@ -145,9 +145,9 @@ class Suki_Sites_Import {
 		if ( 'appearance_page_suki-sites-import' === $hook ) {
 			$suffix = SCRIPT_DEBUG ? '' : '.min';
 
-			wp_enqueue_style( 'suki-sites-import', SUKI_SITES_IMPORT_URI . '/assets/css/sites-import' . $suffix . '.css', array(), SUKI_SITES_IMPORT_VERSION );
+			wp_enqueue_style( 'suki-sites-import', SUKI_SITES_IMPORT_URI . 'assets/css/sites-import' . $suffix . '.css', array(), SUKI_SITES_IMPORT_VERSION );
 
-			wp_enqueue_script( 'suki-sites-import', SUKI_SITES_IMPORT_URI . '/assets/js/sites-import' . $suffix . '.js', array( 'jquery', 'wp-util', 'updates' ), SUKI_SITES_IMPORT_VERSION, true );
+			wp_enqueue_script( 'suki-sites-import', SUKI_SITES_IMPORT_URI . 'assets/js/sites-import' . $suffix . '.js', array( 'jquery', 'wp-util', 'updates' ), SUKI_SITES_IMPORT_VERSION, true );
 			wp_localize_script( 'suki-sites-import', 'SukiSitesImportScriptsData', array(
 				'home_url'           => home_url(),
 				'api_url'            => self::$api_url,
@@ -696,7 +696,9 @@ class Suki_Sites_Import {
 
 			<div class="wp-filter hide-if-no-js"><?php // Site filters (populated via JS) ?></div>
 
-			<div class="theme-browser rendered"><?php // Queried site grid (populated via JS) ?></div>
+			<div class="theme-browser rendered">
+				<div class="themes wp-clearfix"><?php // Queried site grid (populated via JS) ?></div>
+			</div>
 
 			<span class="spinner"></span>
 
@@ -726,26 +728,24 @@ class Suki_Sites_Import {
 			</div>
 		</script>
 
-		<!-- JS Template: site grid. -->
-		<script type="text/template" id="tmpl-suki-sites-import-grid">
-			<div class="themes wp-clearfix">
-				<# for ( var i in data ) { var item = data[i]; #>
-					<div class="theme" data-info="{{ JSON.stringify( item ) }}">
-						<div class="theme-screenshot">
-							<img src="{{ item.screenshot_url }}" alt="">
-						</div>
-						<span class="more-details"><?php esc_html_e( 'Details & Preview', 'suki-sites-import' ); ?></span>
-						<div class="theme-id-container">
-							<h3 class="theme-name">
-								{{{ item.name }}}
-								<# if ( 0 < item.license_plan.id ) { #>
-									<span class="suki-sites-import-badge suki-sites-import-badge-{{ item.license_plan.id }}">{{{ item.license_plan.name }}}</span>
-								<# } #>
-							</h3>
-						</div>
+		<!-- JS Template: site grid items. -->
+		<script type="text/template" id="tmpl-suki-sites-import-grid-items">
+			<# for ( var i in data ) { var item = data[i]; #>
+				<div class="theme" data-info="{{ JSON.stringify( item ) }}">
+					<div class="theme-screenshot">
+						<img src="{{ item.screenshot_url }}" alt="">
 					</div>
-				<# } #>
-			</div>
+					<span class="more-details"><?php esc_html_e( 'Details & Preview', 'suki-sites-import' ); ?></span>
+					<div class="theme-id-container">
+						<h3 class="theme-name">
+							{{{ item.name }}}
+							<# if ( 1 === item.license_plan.id ) { #>
+								<span class="suki-sites-import-badge suki-sites-import-badge-pro"><?php esc_html_e( 'Pro', 'suki-sites-import' ); ?></span>
+							<# } #>
+						</h3>
+					</div>
+				</div>
+			<# } #>
 		</script>
 
 		<!-- JS Template: select builder. -->
@@ -820,6 +820,15 @@ class Suki_Sites_Import {
 				<div class="wp-full-overlay-main">
 					<iframe src="{{ data.preview_url }}" title="<?php esc_attr_e( 'Preview', 'suki-sites-import' ); ?>"></iframe>
 				</div>
+			</div>
+		</script>
+
+		<!-- JS Template: load more. -->
+		<script type="text/template" id="tmpl-suki-sites-import-load-more">
+			<div class="suki-sites-import-load-more">
+				<button class="button button-secondary button-hero">
+					<span class="dashicons dashicons-update"></span><?php esc_html_e( 'Load More', 'suki-sites-import' ); ?>
+				</button>
 			</div>
 		</script>
 		<?php

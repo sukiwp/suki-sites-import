@@ -142,20 +142,24 @@ msgstr ""
 msgid "Install and Activate Now"
 msgstr ""
 
-#: inc/class-suki-sites-import.php:717
+#: inc/class-suki-sites-import.php:719
 msgid "Show all"
 msgstr ""
 
-#: inc/class-suki-sites-import.php:723
+#: inc/class-suki-sites-import.php:725
 msgid "Search site sites"
 msgstr ""
 
-#: inc/class-suki-sites-import.php:724
+#: inc/class-suki-sites-import.php:726
 msgid "or enter keywords..."
 msgstr ""
 
-#: inc/class-suki-sites-import.php:737
+#: inc/class-suki-sites-import.php:738
 msgid "Details & Preview"
+msgstr ""
+
+#: inc/class-suki-sites-import.php:743
+msgid "Pro"
 msgstr ""
 
 #: inc/class-suki-sites-import.php:753
@@ -180,4 +184,8 @@ msgstr ""
 
 #: inc/class-suki-sites-import.php:821
 msgid "Preview"
+msgstr ""
+
+#: inc/class-suki-sites-import.php:830
+msgid "Load More"
 msgstr ""
