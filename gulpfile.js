@@ -7,17 +7,22 @@
 const info = require( './package.json' );
 
 const config = {
+	init: './' + info.name + '.php',
 	src: {
 		scss: [ './assets/scss/**/*.scss' ],
 		css: [ './assets/css/**/*.css', '!./assets/css/vendors/*' ],
 		js: [ './assets/js/**/*.js', '!./assets/js/vendors/*' ],
-		pot: [ './**/*.php', '!./__build/**/*.php' ],
+		pot: [ './**/*.php', '!./__build/**/*.php', '!./__bak/**/*.php' ],
 		build: [
 			'./*',
 			'./assets/css/**/*',
+			'./assets/icons/**/*',
+			'./assets/images/**/*',
 			'./assets/js/**/*',
 			'./inc/**/*',
 			'./languages/**/*',
+			'./page-templates/**/*',
+			'./template-parts/**/*',
 
 			// exclude files and folders
 			'!**/Thumbs.db',
@@ -29,12 +34,14 @@ const config = {
 			'!./README.md',
 			'!./LICENSE.md',
 			'!./__build',
+			'!./__bak',
 		],
 	},
 	dest: {
 		scss: './assets/scss',
 		css: './assets/css',
 		js: './assets/js',
+		icons: './assets/icons',
 		pot: './languages',
 		build: './__build/' + info.name,
 		zip: './__build/zip',
@@ -74,18 +81,18 @@ const zip           = require( 'gulp-zip' );
 gulp.task( 'plugin_info', function() {
 	var info = JSON.parse( fs.readFileSync( './package.json' ) );
 
-	// Change theme version on style.css
-	return gulp.src( [ './' + info.name + '.php' ] )
-		.pipe( replace( /(Plugin Name: ).*/, '$1' + info.title ) )
-		.pipe( replace( /(Plugin URI: ).*/, '$1' + info.uri ) )
-		.pipe( replace( /(Description: ).*/, '$1' + info.description ) )
-		.pipe( replace( /(Version: ).*/, '$1' + info.version ) )
-		.pipe( replace( /(Author: ).*/, '$1' + info.author.name ) )
-		.pipe( replace( /(Author URI: ).*/, '$1' + info.author.url ) )
-		.pipe( replace( /(Text Domain: ).*/, '$1' + info.name ) )
-		.pipe( replace( /(Tags: ).*/, '$1' + info.keywords.join( ', ' ) ) )
+	// Change plugin / theme info
+	return gulp.src( [ config.init ] )
+		.pipe( replace( new RegExp( '((?:Plugin|Theme) Name: ).*' ), '$1' + info.title ) )
+		.pipe( replace( new RegExp( '((?:Plugin|Theme) URI: ).*' ), '$1' + info.uri ) )
+		.pipe( replace( new RegExp( '(Description: ).*' ), '$1' + info.description ) )
+		.pipe( replace( new RegExp( '(Version: ).*' ), '$1' + info.version ) )
+		.pipe( replace( new RegExp( '(Author: ).*' ), '$1' + info.author.name ) )
+		.pipe( replace( new RegExp( '(Author URI: ).*' ), '$1' + info.author.url ) )
+		.pipe( replace( new RegExp( '(Text Domain: ).*' ), '$1' + info.name ) )
+		.pipe( replace( new RegExp( '(Tags: ).*' ), '$1' + info.keywords.join( ', ' ) ) )
 
-		.pipe( replace( /(SUKI_SITES_IMPORT_VERSION', ').*?('.*)/, '$1' + info.version + '$2' ) )
+		.pipe( replace( new RegExp( '(\'' + info.name.replace( '-', '_' ).toUpperCase() + '_VERSION\', \').*?(\'.*)' ), '$1' + info.version + '$2' ) )
 
 		.pipe( gulp.dest( './' ) );
 } );
