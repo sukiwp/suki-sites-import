@@ -64,9 +64,14 @@
 	text-transform: uppercase;
 }
 
-.suki-sites-import-wrap .suki-sites-import-badge-1 {
+.suki-sites-import-wrap .suki-sites-import-badge-pro {
 	background-color: #ee5253;
 	color: #fff;
+}
+
+.suki-sites-import-wrap .suki-sites-import-load-more {
+	margin-top: 28px;
+	text-align: center;
 }
 
 .suki-sites-import-wrap .suki-sites-import-preview {
