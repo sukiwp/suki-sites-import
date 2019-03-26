@@ -116,7 +116,7 @@ gulp.task( 'readme_txt', function() {
 
 		.pipe( replace( /(\s\s).*(\s\s== Description ==)/, '$1' + info.description + '$2' ) )
 
-		.pipe( replace( /(== Description ==\s\s).*(\s\s)/, '$1' + info.description + '$2' ) )
+		// .pipe( replace( /(== Description ==\s\s).*(\s\s)/, '$1' + info.description + '$2' ) )
 
 		.pipe( gulp.dest( './' ) );
 } );
