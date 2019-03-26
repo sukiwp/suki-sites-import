@@ -2,27 +2,46 @@
 Contributors: sukiwp
 Tags: 
 Requires at least: 4.6
-Tested up to: 4.9
-Stable tag: 1.0.0-dev
+Tested up to: 5.1
+Stable tag: 1.0.0
 Requires PHP: 5.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Companion plugin for Suki theme to browse collections of demo sites and import them into your fresh site in one click.
+Collection of "one click demo import" websites in various categories and niches built with Elementor and Gutenberg.
 
 == Description ==
 
-Companion plugin for Suki theme to browse collections of demo sites and import them into your fresh site in one click.
+Kickstart your website project with our ready-to-use demo sites built with Elementor and Gutenberg. You can choose among different categories and niches, such as blog, online stores, portfolio, wedding, restaurant, company profile, etc. After you have found the demo site that suits your needs, you can "one click import" the demo site into your own site.
 
-This plugin only works for [Suki WordPress theme](https://sukiwp.com/). You can download Suki WordPress theme for free.
+This plugin requires [Suki WordPress theme](https://sukiwp.com/) to be installed.
+
+= About PRO Demo Sites =
+
+In addition to the FREE demo sites, we also have some PRO demo sites which are more advanced and detailed. In order to import the PRO demo sites, you would need an active license of Suki Pro - Design Plan. Learn more about Suki Pro and its powerful features on [our website](https://sukiwp.com/pro/).
+
+= Disclaimer =
+
+This plugin will retrieve and fetch demo sites list from [our server](https://demo.sukiwp.com/) through API calls. We will use some of your data, like your site URL and your license key of Suki Pro (if any), to validate the access privilege to our PRO demo sites. The PRO demo sites can only be imported when you have an active and valid license of Suki Pro - Design plan. Your data remains safe with us and won't be shared to other 3rd parties.
+
+By using this plugin you accept and agree to this policy.
+
+== Frequently Asked Questions ==
+
+= Will this Suki Sites Import plugin work with any theme? =
+
+All demo sites are built using Suki WordPress theme. Therefore, in order to use this plugin and import the demo site, you would need to install Suki WordPress theme.
+
+= Will you add more demo sites? =
+
+Yes! We continuously add new demo sites in various categories and niches. You will automatically see updates in the plugin's page whenever we added new demo sites.
 
 == Installation ==
 
 1. Go to Plugins > Add New.
 2. Search for "Suki Sites Import" and wait until the plugin appears in the results.
 3. Install the plugin and then activate it right away.
-4. Go to Appearance > Sites Import.
-5. Browse the available demo sites and import it in one click.
+4. Go to Appearance > Sites Import to see the available demo sites.
 
 == Changelog ==
 

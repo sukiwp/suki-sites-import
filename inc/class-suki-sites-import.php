@@ -44,7 +44,7 @@ class Suki_Sites_Import {
 	 * Class constructor
 	 */
 	protected function __construct() {
-		self::$api_url = apply_filters( 'suki/sites_import/api_url', SUKI_SITES_IMPORT_API_URL );
+		self::$api_url = apply_filters( 'suki/sites_import/api_url', 'https://demo.sukiwp.com/wp-json/suki/v1/' );
 
 		add_action( 'plugins_loaded', array( $this, 'load_plugin_textdomain' ) );
 		add_action( 'after_setup_theme', array( $this, 'init' ) );

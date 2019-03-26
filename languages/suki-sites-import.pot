@@ -22,7 +22,7 @@ msgid "http://wordpress.org/plugins/suki-sites-import"
 msgstr ""
 
 #: suki-sites-import.php:5
-msgid "Companion plugin for Suki theme to browse collections of demo sites and import them into your fresh site in one click."
+msgid "Collection of \"one click demo import\" websites in various categories and niches built with Elementor and Gutenberg."
 msgstr ""
 
 #: suki-sites-import.php:7

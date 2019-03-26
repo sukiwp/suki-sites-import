@@ -1,13 +1,13 @@
 {
 	"name": "suki-sites-import",
 	"title": "Suki Sites Import",
-	"description": "Companion plugin for Suki theme to browse collections of demo sites and import them into your fresh site in one click.",
+	"description": "Collection of \"one click demo import\" websites in various categories and niches built with Elementor and Gutenberg.",
 	"uri": "http://wordpress.org/plugins/suki-sites-import",
 	"author": {
 		"name": "Suki WordPress Theme",
 		"url": "https://sukiwp.com/#about"
 	},
-	"version": "1.0.0-dev",
+	"version": "1.0.0",
 	"license": "GPL-2.0-or-later",
 	"keywords": [],
 	"private": true,
