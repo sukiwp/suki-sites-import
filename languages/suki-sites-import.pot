@@ -13,7 +13,7 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: suki-sites-import.php:3, inc/class-suki-sites-import.php:131
+#: suki-sites-import.php:3, inc/class-suki-sites-import.php:132
 msgid "Suki Sites Import"
 msgstr ""
 
@@ -33,67 +33,71 @@ msgstr ""
 msgid "https://sukiwp.com/#about"
 msgstr ""
 
-#: inc/class-suki-sites-import.php:132
+#: inc/class-suki-sites-import.php:133
 msgid "Sites Import"
 msgstr ""
 
-#: inc/class-suki-sites-import.php:157
+#: inc/class-suki-sites-import.php:164
 msgid "Install & Activate"
 msgstr ""
 
-#: inc/class-suki-sites-import.php:158
+#: inc/class-suki-sites-import.php:165
 msgid "Installing"
 msgstr ""
 
-#: inc/class-suki-sites-import.php:159
+#: inc/class-suki-sites-import.php:166
 msgid "Activate"
 msgstr ""
 
-#: inc/class-suki-sites-import.php:160
+#: inc/class-suki-sites-import.php:167
 msgid "Activating"
 msgstr ""
 
-#: inc/class-suki-sites-import.php:161
+#: inc/class-suki-sites-import.php:168
 msgid "Active"
 msgstr ""
 
-#: inc/class-suki-sites-import.php:163
+#: inc/class-suki-sites-import.php:170
 msgid "Upgrade Your License"
 msgstr ""
 
-#: inc/class-suki-sites-import.php:164
+#: inc/class-suki-sites-import.php:171
 msgid "Please Activate Required Plugins"
 msgstr ""
 
-#: inc/class-suki-sites-import.php:165
+#: inc/class-suki-sites-import.php:172
 msgid "Import This Site"
 msgstr ""
 
-#: inc/class-suki-sites-import.php:166
-msgid "Preparing your data..."
+#: inc/class-suki-sites-import.php:173
+msgid "Validating data..."
 msgstr ""
 
-#: inc/class-suki-sites-import.php:167
+#: inc/class-suki-sites-import.php:174
+msgid "Activating required modules..."
+msgstr ""
+
+#: inc/class-suki-sites-import.php:175
 msgid "Importing contents..."
 msgstr ""
 
-#: inc/class-suki-sites-import.php:168
+#: inc/class-suki-sites-import.php:176
 msgid "Importing theme options..."
 msgstr ""
 
-#: inc/class-suki-sites-import.php:169
+#: inc/class-suki-sites-import.php:177
 msgid "Importing widgets..."
 msgstr ""
 
-#: inc/class-suki-sites-import.php:170
+#: inc/class-suki-sites-import.php:178
 msgid "Importing other options..."
 msgstr ""
 
-#: inc/class-suki-sites-import.php:171
+#: inc/class-suki-sites-import.php:179
 msgid "Finished! Visit your site"
 msgstr ""
 
-#: inc/class-suki-sites-import.php:173
+#: inc/class-suki-sites-import.php:181
 msgid ""
 "Before importing this site site, please note:\n"
 "\n"
@@ -106,86 +110,86 @@ msgid ""
 ""
 msgstr ""
 
-#: inc/class-suki-sites-import.php:175
+#: inc/class-suki-sites-import.php:183
 msgid "Warning! The import process is not finished yet. Don't close the window until import process complete, otherwise the imported data might be corrupted. Do you still want to leave the window?"
 msgstr ""
 
-#: inc/class-suki-sites-import.php:177
+#: inc/class-suki-sites-import.php:185
 msgid "Failed to fetch site info"
 msgstr ""
 
-#: inc/class-suki-sites-import.php:178
+#: inc/class-suki-sites-import.php:186
 msgid "Invalid plugin status, please refresh this page."
 msgstr ""
 
-#: inc/class-suki-sites-import.php:179
+#: inc/class-suki-sites-import.php:187
 msgid "Invalid action, please refresh this page."
 msgstr ""
 
-#: inc/class-suki-sites-import.php:180
+#: inc/class-suki-sites-import.php:188
 msgid "Invalid requirements for importing, please refresh this page."
 msgstr ""
 
-#: inc/class-suki-sites-import.php:296
+#: inc/class-suki-sites-import.php:304, inc/class-suki-sites-import.php:327
 msgid "You are not permitted to install plugins."
 msgstr ""
 
-#: inc/class-suki-sites-import.php:670
+#: inc/class-suki-sites-import.php:701
 msgid "Suki Sites Import (plugin) requires Suki theme to be installed and activated."
 msgstr ""
 
-#: inc/class-suki-sites-import.php:675
+#: inc/class-suki-sites-import.php:706
 msgid "Activate Now"
 msgstr ""
 
-#: inc/class-suki-sites-import.php:678
+#: inc/class-suki-sites-import.php:709
 msgid "Install and Activate Now"
 msgstr ""
 
-#: inc/class-suki-sites-import.php:719
-msgid "Show all"
+#: inc/class-suki-sites-import.php:750
+msgid "Show All"
 msgstr ""
 
-#: inc/class-suki-sites-import.php:725
+#: inc/class-suki-sites-import.php:756
 msgid "Search site sites"
 msgstr ""
 
-#: inc/class-suki-sites-import.php:726
+#: inc/class-suki-sites-import.php:757
 msgid "or enter keywords..."
 msgstr ""
 
-#: inc/class-suki-sites-import.php:738
+#: inc/class-suki-sites-import.php:769
 msgid "Details & Preview"
 msgstr ""
 
-#: inc/class-suki-sites-import.php:743
+#: inc/class-suki-sites-import.php:774
 msgid "Pro"
 msgstr ""
 
-#: inc/class-suki-sites-import.php:753
+#: inc/class-suki-sites-import.php:784
 msgid "Select your page builder."
 msgstr ""
 
-#: inc/class-suki-sites-import.php:758
+#: inc/class-suki-sites-import.php:789
 msgid "No site found. Try a different search."
 msgstr ""
 
-#: inc/class-suki-sites-import.php:766
+#: inc/class-suki-sites-import.php:797
 msgid "Close"
 msgstr ""
 
-#: inc/class-suki-sites-import.php:782
-msgid "To import this site you need an active license of {{ data.license_plan.name }} plan. Please upgrade or renew your expired license, and then activate your license on \"Appearance > Suki\" page."
+#: inc/class-suki-sites-import.php:813
+msgid "To import this site you need an active license of {{ data.license_plan.name }} plan. Please upgrade or renew your license first. And then install Suki Pro plugin and activate your license on \"Appearance > Suki\" page."
 msgstr ""
 
-#: inc/class-suki-sites-import.php:791
+#: inc/class-suki-sites-import.php:822
 msgid "Required Plugins"
 msgstr ""
 
-#: inc/class-suki-sites-import.php:821
+#: inc/class-suki-sites-import.php:852
 msgid "Preview"
 msgstr ""
 
-#: inc/class-suki-sites-import.php:830
+#: inc/class-suki-sites-import.php:861
 msgid "Load More"
 msgstr ""

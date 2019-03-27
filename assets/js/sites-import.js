@@ -96,6 +96,7 @@
 				page: 1,
 				per_page: 15,
 				license_key: SukiSitesImportScriptsData.license_key,
+				demo_status: SukiSitesImportScriptsData.demo_status,
 			}, SukiSitesImport.currentGridFilters );
 
 			var $loadMoreButton = SukiSitesImport.$container.find( '.suki-sites-import-load-more' );
@@ -215,6 +216,7 @@
 					addClass = 'button-primary';
 					break;
 
+				case 'activating_pro_modules':
 				case 'importing_contents':
 				case 'importing_customizer':
 				case 'importing_widgets':
@@ -328,8 +330,13 @@
 			var log = 'Fetching site data for last validation.';
 			console.log( log );
 
+			SukiSitesImport.changeActionButtonStatus( 'validating_data' );
+
+			window.addEventListener( 'beforeunload', SukiSitesImport.confirmTabClosing );
+
 			var args = $.extend({
 				license_key: SukiSitesImportScriptsData.license_key,
+				demo_status: SukiSitesImportScriptsData.demo_status,
 			}, SukiSitesImport.currentGridFilters );
 
 			var queryString = '';
@@ -347,13 +354,43 @@
 			})
 			.done(function( response, status, XHR ) {
 				if ( status ) {
-					// Step 2: Importing data from contents.xml.
-					SukiSitesImport.importContents();
+					// Step 1: Activate required Suki Pro modules.
+					SukiSitesImport.activateProModules();
 				} else {
 					alert( 'Error: ' + log + '\n' + response.data );
 				}
 			});
+		},
 
+		activateProModules: function() {
+			var log = 'Activating required Suki Pro modules.';
+			console.log( log );
+
+			if ( 0 < SukiSitesImport.currentPreviewInfo.required_pro_modules.length ) {
+				SukiSitesImport.changeActionButtonStatus( 'activating_pro_modules' );
+
+				$.ajax({
+					method: 'POST',
+					url: ajaxurl + '?do=suki_sites_import__activate_pro_modules',
+					cache: false,
+					data: {
+						action: 'suki_sites_import__activate_pro_modules',
+						pro_modules: SukiSitesImport.currentPreviewInfo.required_pro_modules,
+						_ajax_nonce: SukiSitesImportScriptsData.ajax_nonce,
+					},
+				})
+				.done(function( response, status, XHR ) {
+					if ( status ) {
+						// Step 2: Importing data from contents.xml.
+						SukiSitesImport.importContents();
+					} else {
+						alert( 'Error: ' + log + '\n' + response.data );
+					}
+				});
+			} else {
+				// Step 2: Importing data from contents.xml.
+				SukiSitesImport.importContents();
+			}
 		},
 
 		importContents: function() {
@@ -361,8 +398,6 @@
 			console.log( log );
 
 			SukiSitesImport.changeActionButtonStatus( 'importing_contents' );
-
-			window.addEventListener( 'beforeunload', SukiSitesImport.confirmTabClosing );
 
 			$.ajax({
 				method: 'POST',

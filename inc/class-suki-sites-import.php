@@ -79,6 +79,7 @@ class Suki_Sites_Import {
 			add_action( 'wp_ajax_suki_sites_import__install_plugin', array( $this, 'ajax_install_plugin' ) );
 			add_action( 'wp_ajax_suki_sites_import__activate_plugin', array( $this, 'ajax_activate_plugin' ) );
 
+			add_action( 'wp_ajax_suki_sites_import__activate_pro_modules', array( $this, 'ajax_activate_pro_modules' ) );
 			add_action( 'wp_ajax_suki_sites_import__import_contents', array( $this, 'ajax_import_contents' ) );
 			add_action( 'wp_ajax_suki_sites_import__import_customizer', array( $this, 'ajax_import_customizer' ) );
 			add_action( 'wp_ajax_suki_sites_import__import_widgets', array( $this, 'ajax_import_widgets' ) );
@@ -145,6 +146,11 @@ class Suki_Sites_Import {
 		if ( 'appearance_page_suki-sites-import' === $hook ) {
 			$suffix = SCRIPT_DEBUG ? '' : '.min';
 
+			$status = array();
+			if ( defined( 'SUKI_DEVELOPMENT_MODE' ) && SUKI_DEVELOPMENT_MODE ) {
+				$status = array( 'publish', 'pending' );
+			}
+
 			wp_enqueue_style( 'suki-sites-import', SUKI_SITES_IMPORT_URI . 'assets/css/sites-import' . $suffix . '.css', array(), SUKI_SITES_IMPORT_VERSION );
 
 			wp_enqueue_script( 'suki-sites-import', SUKI_SITES_IMPORT_URI . 'assets/js/sites-import' . $suffix . '.js', array( 'jquery', 'wp-util', 'updates' ), SUKI_SITES_IMPORT_VERSION, true );
@@ -153,6 +159,7 @@ class Suki_Sites_Import {
 				'api_url'            => self::$api_url,
 				'ajax_nonce'         => wp_create_nonce( 'suki-sites-import' ),
 				'license_key'        => get_option( 'suki_pro_license_key', null ),
+				'demo_status'        => $status,
 				'strings'            => array(
 					'plugin_not_installed'              => esc_html__( 'Install & Activate', 'suki-sites-import' ),
 					'plugin_installing'                 => esc_html__( 'Installing', 'suki-sites-import' ),
@@ -163,7 +170,8 @@ class Suki_Sites_Import {
 					'action_upgrade_required'           => esc_html__( 'Upgrade Your License', 'suki-sites-import' ),
 					'action_plugins_not_active'         => esc_html__( 'Please Activate Required Plugins', 'suki-sites-import' ),
 					'action_ready_to_import'            => esc_html__( 'Import This Site', 'suki-sites-import' ),
-					'action_downloading_contents_xml'   => esc_html__( 'Preparing your data...', 'suki-sites-import' ),
+					'action_validating_data'            => esc_html__( 'Validating data...', 'suki-sites-import' ),
+					'action_activating_pro_modules'     => esc_html__( 'Activating required modules...', 'suki-sites-import' ),
 					'action_importing_contents'         => esc_html__( 'Importing contents...', 'suki-sites-import' ),
 					'action_importing_customizer'       => esc_html__( 'Importing theme options...', 'suki-sites-import' ),
 					'action_importing_widgets'          => esc_html__( 'Importing widgets...', 'suki-sites-import' ),
@@ -287,12 +295,35 @@ class Suki_Sites_Import {
 	}
 
 	/**
+	 * AJAX callback to activate all required Suki Pro modules.
+	 */
+	public function ajax_activate_pro_modules() {
+		check_ajax_referer( 'suki-sites-import', '_ajax_nonce' );
+
+		if ( ! current_user_can( 'edit_theme_options' ) ) {
+			wp_send_json_error( esc_html__( 'You are not permitted to install plugins.', 'suki-sites-import' ) );
+		}
+
+		if ( isset( $_REQUEST['pro_modules'] ) && is_array( $_REQUEST['pro_modules'] ) ) {
+			$slugs = array();
+
+			foreach ( $_REQUEST['pro_modules'] as $key => $module ) {
+				$slugs[] = $module['slug'];
+			}
+
+			update_option( 'suki_pro_active_modules', $slugs );
+		}
+
+		wp_send_json_success();
+	}
+
+	/**
 	 * AJAX callback to import contents and media files from contents.xml.
 	 */
 	public function ajax_import_contents() {
 		check_ajax_referer( 'suki-sites-import', '_ajax_nonce' );
 
-		if ( ! current_user_can( 'install_plugins' ) || ! isset( $_REQUEST['contents_xml_file_url'] ) ) {
+		if ( ! current_user_can( 'edit_theme_options' ) || ! isset( $_REQUEST['contents_xml_file_url'] ) ) {
 			wp_send_json_error( esc_html__( 'You are not permitted to install plugins.', 'suki-sites-import' ) );
 		}
 		
@@ -716,7 +747,7 @@ class Suki_Sites_Import {
 			</div>
 			<div class="suki-sites-import-filters-right">
 				<ul class="suki-sites-import-categories-filter filter-links">
-					<li><a href="#" data-id="-1" class="current"><?php esc_html_e( 'Show all', 'suki-sites-import' ); ?></a></li>
+					<li><a href="#" data-id="-1" class="current"><?php esc_html_e( 'Show All', 'suki-sites-import' ); ?></a></li>
 					<# for ( var i in data.categories ) { var item = data.categories[i]; #>
 						<li><a href="#" data-id="{{ item.id }}">{{{ item.name }}}</a></li>
 					<# } #>
@@ -779,7 +810,7 @@ class Suki_Sites_Import {
 								case 'require_higher_license_plan':
 									#>
 									<div class="suki-sites-import-preview-notice notice inline notice-alt notice-warning">
-										<p><?php esc_html_e( 'To import this site you need an active license of {{ data.license_plan.name }} plan. Please upgrade or renew your expired license, and then activate your license on "Appearance > Suki" page.', 'suki-sites-import' ); ?></p>
+										<p><?php esc_html_e( 'To import this site you need an active license of {{ data.license_plan.name }} plan. Please upgrade or renew your license first. And then install Suki Pro plugin and activate your license on "Appearance > Suki" page.', 'suki-sites-import' ); ?></p>
 									</div>
 									<#
 									break;
