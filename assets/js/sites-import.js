@@ -70,7 +70,18 @@
 
 				$( 'body' ).removeClass( 'loading-content' );
 
-				SukiSitesImport.showBuilderSelector();
+				var $selectedBuilder = SukiSitesImport.$filters.find( '.suki-sites-import-builders-filter a[data-id="' + SukiSitesImportScriptsData.selected_builder + '"]' );
+
+				if ( 0 < $selectedBuilder.length ) {
+					$selectedBuilder.addClass( 'current' );
+
+					SukiSitesImport.currentGridFilters.builder = SukiSitesImportScriptsData.selected_builder;
+					SukiSitesImport.currentGridFilters.page = 1;
+
+					SukiSitesImport.loadSitesGrid( true );
+				} else {
+					SukiSitesImport.showBuilderSelector();
+				}
 			});
 		},
 
@@ -96,8 +107,11 @@
 				page: 1,
 				per_page: 15,
 				license_key: SukiSitesImportScriptsData.license_key,
-				demo_status: SukiSitesImportScriptsData.demo_status,
 			}, SukiSitesImport.currentGridFilters );
+
+			if ( SukiSitesImportScriptsData.demo_status ) {
+				args.demo_status = SukiSitesImportScriptsData.demo_status;
+			}
 
 			var $loadMoreButton = SukiSitesImport.$container.find( '.suki-sites-import-load-more' );
 			if ( 0 < $loadMoreButton.length ) {
@@ -522,6 +536,24 @@
 
 			SukiSitesImport.currentGridFilters.builder = builder;
 			SukiSitesImport.currentGridFilters.page = 1;
+
+			$.ajax({
+				method: 'POST',
+				url: ajaxurl + '?do=suki_sites_import__select_builder',
+				cache: false,
+				data: {
+					action: 'suki_sites_import__select_builder',
+					builder: builder,
+					_ajax_nonce: SukiSitesImportScriptsData.ajax_nonce,
+				},
+			})
+			.done(function( response, status, XHR ) {
+				if ( response.success ) {
+					
+				} else {
+					alert( 'Error: ' + log + '\n' + response.data );
+				}
+			});
 
 			SukiSitesImport.loadSitesGrid( true );
 		},
