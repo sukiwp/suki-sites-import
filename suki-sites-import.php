@@ -2,7 +2,7 @@
 /*
 Plugin Name: Suki Sites Import
 Plugin URI: http://wordpress.org/plugins/suki-sites-import
-Description: Collection of "one click demo import" websites in various categories and niches built with Elementor and Gutenberg.
+Description: Collection of ready-to-use templates (demo sites) built for Elementor and Gutenberg.
 Version: 1.0.0
 Author: Suki WordPress Theme
 Author URI: https://sukiwp.com/#about

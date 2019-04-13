@@ -8,17 +8,17 @@ Requires PHP: 5.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Collection of "one click demo import" websites in various categories and niches built with Elementor and Gutenberg.
+Collection of ready-to-use templates (demo sites) built for Elementor and Gutenberg.
 
 == Description ==
 
-Kickstart your website project with our ready-to-use demo sites built with Elementor and Gutenberg. You can choose among different categories and niches, such as blog, online stores, portfolio, wedding, restaurant, company profile, etc. After you have found the demo site that suits your needs, you can "one click import" the demo site into your own site.
+Kickstart your project with our ready-to-use templates (demo sites) built for Elementor and Gutenberg. Choose among different categories and niches, such as blog, online stores, portfolio, wedding, restaurant, company profile, etc. And then simply import the demo site that you like into your own website instantly.
 
 This plugin requires [Suki WordPress theme](https://sukiwp.com/) to be installed.
 
 = About PRO Demo Sites =
 
-In addition to the FREE demo sites, we also have some PRO demo sites which are more advanced and detailed. In order to import the PRO demo sites, you would need an active license of Suki Pro - Design Plan. Learn more about Suki Pro and its powerful features on [our website](https://sukiwp.com/pro/).
+In addition to the FREE demo sites, we also have some PRO demo sites which are more advanced and detailed. In order to import the PRO demo sites, you would need an active license of Suki Pro - Design Plan. Learn more about Suki Pro and its full features on [our website](https://sukiwp.com/pro/).
 
 = Disclaimer =
 
