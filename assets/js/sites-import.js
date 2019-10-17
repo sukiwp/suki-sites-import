@@ -350,8 +350,11 @@
 
 			var args = $.extend({
 				license_key: SukiSitesImportScriptsData.license_key,
-				demo_status: SukiSitesImportScriptsData.demo_status,
 			}, SukiSitesImport.currentGridFilters );
+			
+			if ( SukiSitesImportScriptsData.demo_status ) {
+				args.demo_status = SukiSitesImportScriptsData.demo_status;
+			}
 
 			var queryString = '';
 			$.each( args, function( key, value ) {
