@@ -30,7 +30,7 @@ By using this plugin you accept and agree to this policy.
 
 = Will this Suki Sites Import plugin work with any theme? =
 
-All demo sites are built using Suki WordPress theme. Therefore, in order to use this plugin and import the demo site, you would need to install Suki WordPress theme.
+All demo sites are built using Suki WordPress theme. Therefore, in order to use this plugin and import the demo site, you would need to install [Suki WordPress theme](https://sukiwp.com/).
 
 = Will you add more demo sites? =
 
@@ -48,3 +48,7 @@ Yes! We continuously add new demo sites in various categories and niches. You wi
 = v1.0.0 =
 
 * Initial release
+
+= v1.0.1 =
+
+* FIX: Error 500 when importing contents on some PHP servers

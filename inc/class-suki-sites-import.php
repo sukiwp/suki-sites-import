@@ -158,31 +158,31 @@ class Suki_Sites_Import {
 				'license_key'        => get_option( 'suki_pro_license_key', null ),
 				'selected_builder'   => intval( get_option( 'suki_sites_import_selected_builder' ) ),
 				'strings'            => array(
-					'plugin_not_installed'              => esc_html__( 'Install & Activate', 'suki-sites-import' ),
-					'plugin_installing'                 => esc_html__( 'Installing', 'suki-sites-import' ),
-					'plugin_inactive'                   => esc_html__( 'Activate', 'suki-sites-import' ),
-					'plugin_activating'                 => esc_html__( 'Activating', 'suki-sites-import' ),
-					'plugin_active'                     => esc_html__( 'Active', 'suki-sites-import' ),
+					'plugin_not_installed'          => esc_html__( 'Install & Activate', 'suki-sites-import' ),
+					'plugin_installing'             => esc_html__( 'Installing', 'suki-sites-import' ),
+					'plugin_inactive'               => esc_html__( 'Activate', 'suki-sites-import' ),
+					'plugin_activating'             => esc_html__( 'Activating', 'suki-sites-import' ),
+					'plugin_active'                 => esc_html__( 'Active', 'suki-sites-import' ),
 
-					'action_upgrade_required'           => esc_html__( 'Upgrade Your License', 'suki-sites-import' ),
-					'action_plugins_not_active'         => esc_html__( 'Please Activate Required Plugins', 'suki-sites-import' ),
-					'action_ready_to_import'            => esc_html__( 'Import This Site', 'suki-sites-import' ),
-					'action_validating_data'            => esc_html__( 'Validating data...', 'suki-sites-import' ),
-					'action_activating_pro_modules'     => esc_html__( 'Activating required modules...', 'suki-sites-import' ),
-					'action_importing_contents'         => esc_html__( 'Importing contents...', 'suki-sites-import' ),
-					'action_importing_customizer'       => esc_html__( 'Importing theme options...', 'suki-sites-import' ),
-					'action_importing_widgets'          => esc_html__( 'Importing widgets...', 'suki-sites-import' ),
-					'action_importing_options'          => esc_html__( 'Importing other options...', 'suki-sites-import' ),
-					'action_finished'                   => esc_html__( 'Finished! Visit your site', 'suki-sites-import' ),
+					'action_upgrade_required'       => esc_html__( 'Upgrade Your License', 'suki-sites-import' ),
+					'action_plugins_not_active'     => esc_html__( 'Please Activate Required Plugins', 'suki-sites-import' ),
+					'action_ready_to_import'        => esc_html__( 'Import This Site', 'suki-sites-import' ),
+					'action_validating_data'        => esc_html__( 'Validating data...', 'suki-sites-import' ),
+					'action_activating_pro_modules' => esc_html__( 'Activating required modules...', 'suki-sites-import' ),
+					'action_importing_contents'     => esc_html__( 'Importing contents...', 'suki-sites-import' ),
+					'action_importing_customizer'   => esc_html__( 'Importing theme options...', 'suki-sites-import' ),
+					'action_importing_widgets'      => esc_html__( 'Importing widgets...', 'suki-sites-import' ),
+					'action_importing_options'      => esc_html__( 'Importing other options...', 'suki-sites-import' ),
+					'action_finished'               => esc_html__( 'Finished! Visit your site', 'suki-sites-import' ),
 
-					'confirm_import'                    => esc_html__( "Before importing this site site, please note:\n\n1. It is recommended to run import on a fresh WordPress installation (no data has been added). You can reset to fresh installation using any \"WordPress reset\" plugin.\n\n2. Importing site site data into a non-fresh installation might overwrite your existing content.\n\n3. Copyrighted media will not be imported and will be replaced with placeholders.\n\n", 'suki-sites-import' ),
+					'confirm_import'                => esc_html__( "Before importing this site site, please note:\n\n1. It is recommended to run import on a fresh WordPress installation (no data has been added). You can reset to fresh installation using any \"WordPress reset\" plugin.\n\n2. Importing site site data into a non-fresh installation might overwrite your existing content.\n\n3. Copyrighted media will not be imported and will be replaced with placeholders.\n\n", 'suki-sites-import' ),
 
-					'confirm_close_importing'           => esc_html__( 'Warning! The import process is not finished yet. Don\'t close the window until import process complete, otherwise the imported data might be corrupted. Do you still want to leave the window?', 'suki-sites-import' ),
+					'confirm_close_importing'       => esc_html__( 'Warning! The import process is not finished yet. Don\'t close the window until import process complete, otherwise the imported data might be corrupted. Do you still want to leave the window?', 'suki-sites-import' ),
 
-					'site_error_invalid'                => esc_html__( 'Failed to fetch site info', 'suki-sites-import' ),
-					'plugin_error_invalid'              => esc_html__( 'Invalid plugin status, please refresh this page.', 'suki-sites-import' ),
-					'action_error_invalid'              => esc_html__( 'Invalid action, please refresh this page.', 'suki-sites-import' ),
-					'import_error_invalid'              => esc_html__( 'Invalid requirements for importing, please refresh this page.', 'suki-sites-import' ),
+					'site_error_invalid'            => esc_html__( 'Failed to fetch site info', 'suki-sites-import' ),
+					'plugin_error_invalid'          => esc_html__( 'Invalid plugin status, please refresh this page.', 'suki-sites-import' ),
+					'action_error_invalid'          => esc_html__( 'Invalid action, please refresh this page.', 'suki-sites-import' ),
+					'import_error_invalid'          => esc_html__( 'Invalid requirements for importing, please refresh this page.', 'suki-sites-import' ),
 				),
 			) ) );
 		}
@@ -430,6 +430,19 @@ class Suki_Sites_Import {
 		/**
 		 * Prepare the importer.
 		 */
+
+		// Turn off PHP output compression
+		$previous = error_reporting( error_reporting() ^ E_WARNING );
+		ini_set( 'output_buffering', 'off' );
+		ini_set( 'zlib.output_compression', false );
+		error_reporting( $previous );
+
+		// Time to run the import!
+		set_time_limit( 0 );
+
+		// Ensure we're not buffered.
+		wp_ob_end_flush_all();
+		flush();
 
 		// Are we allowed to create users?
 		add_filter( 'wxr_importer.pre_process.user', '__return_null' );
