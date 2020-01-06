@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Suki Sites Import
+# Copyright (C) 2020 Suki Sites Import
 # This file is distributed under the same license as the Suki Sites Import package.
 msgid ""
 msgstr ""
