@@ -893,7 +893,7 @@ class Suki_Sites_Import {
 		<script type="text/template" id="tmpl-suki-sites-import-load-more">
 			<div class="suki-sites-import-load-more">
 				<button class="button button-secondary button-hero">
-					<span class="dashicons dashicons-update"></span><?php esc_html_e( 'Load More', 'suki-sites-import' ); ?>
+					<?php esc_html_e( 'Load More', 'suki-sites-import' ); ?>
 				</button>
 			</div>
 		</script>

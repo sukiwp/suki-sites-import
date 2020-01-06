@@ -45,10 +45,10 @@ Yes! We continuously add new demo sites in various categories and niches. You wi
 
 == Changelog ==
 
-= v1.0.0 =
-
-* Initial release
-
 = v1.0.1 =
 
 * FIX: Error 500 when importing contents on some PHP servers
+
+= v1.0.0 =
+
+* Initial release
