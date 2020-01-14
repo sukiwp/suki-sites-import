@@ -1,5 +1,5 @@
 === Suki Sites Import ===
-Contributors: sukiwp
+Contributors: sukiwp, daviedr
 Tags: 
 Requires at least: 4.6
 Tested up to: 5.1
@@ -47,8 +47,9 @@ Yes! We continuously add new demo sites in various categories and niches. You wi
 
 = v1.0.1 =
 
-* FIX: Error 500 when importing contents on some PHP servers
+* TWEAK: Translation loader.
+* FIX: Error 500 when importing contents on some PHP servers.
 
 = v1.0.0 =
 
-* Initial release
+* Initial release.
