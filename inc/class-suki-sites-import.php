@@ -60,7 +60,7 @@ class Suki_Sites_Import {
 	 * Load plugin textdomain.
 	 */
 	public function load_plugin_textdomain() {
-		load_plugin_textdomain( 'suki-sites-import' );
+		load_plugin_textdomain( 'suki-sites-import', false, dirname( plugin_basename( SUKI_PRO_FILE ) ) . '/languages' );
 	}
 
 	/**
