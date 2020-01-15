@@ -45,6 +45,10 @@ Yes! We continuously add new demo sites in various categories and niches. You wi
 
 == Changelog ==
 
+= v1.0.2 =
+
+* FIX: PHP Warning of undefined constant.
+
 = v1.0.1 =
 
 * TWEAK: Translation loader.
