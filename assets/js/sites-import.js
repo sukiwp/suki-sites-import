@@ -62,6 +62,7 @@
 
 			$.ajax({
 				method: 'GET',
+				dataType: 'JSON',
 				url: SukiSitesImportScriptsData.api_url + 'site_filters/',
 				cache: false,
 			})
@@ -133,6 +134,7 @@
 
 			$.ajax({
 				method: 'GET',
+				dataType: 'JSON',
 				url: SukiSitesImportScriptsData.api_url + 'sites/' + queryString,
 				cache: false,
 			})
@@ -274,6 +276,7 @@
 
 			return $.ajax({
 				method: 'POST',
+				dataType: 'JSON',
 				url: ajaxurl + '?do=suki_sites_import__install_plugin',
 				cache: false,
 				data: {
@@ -312,6 +315,7 @@
 
 			return $.ajax({
 				method: 'POST',
+				dataType: 'JSON',
 				url: ajaxurl + '?do=suki_sites_import__activate_plugin',
 				cache: false,
 				data: {
@@ -366,6 +370,7 @@
 
 			$.ajax({
 				method: 'GET',
+				dataType: 'JSON',
 				url: SukiSitesImportScriptsData.api_url + 'sites/' + SukiSitesImport.currentPreviewInfo.id + '/' + queryString,
 				cache: false,
 			})
@@ -388,6 +393,7 @@
 
 				$.ajax({
 					method: 'POST',
+					dataType: 'JSON',
 					url: ajaxurl + '?do=suki_sites_import__activate_pro_modules',
 					cache: false,
 					data: {
@@ -418,6 +424,7 @@
 
 			$.ajax({
 				method: 'POST',
+				dataType: 'JSON',
 				url: ajaxurl + '?do=suki_sites_import__import_contents',
 				cache: false,
 				data: {
@@ -444,6 +451,7 @@
 
 			$.ajax({
 				method: 'POST',
+				dataType: 'JSON',
 				url: ajaxurl + '?do=suki_sites_import__import_customizer',
 				cache: false,
 				data: {
@@ -471,6 +479,7 @@
 
 			$.ajax({
 				method: 'POST',
+				dataType: 'JSON',
 				url: ajaxurl + '?do=suki_sites_import__import_widgets',
 				cache: false,
 				data: {
@@ -497,6 +506,7 @@
 
 			$.ajax({
 				method: 'POST',
+				dataType: 'JSON',
 				url: ajaxurl + '?do=suki_sites_import__import_options',
 				cache: false,
 				data: {
@@ -542,6 +552,7 @@
 
 			$.ajax({
 				method: 'POST',
+				dataType: 'JSON',
 				url: ajaxurl + '?do=suki_sites_import__select_builder',
 				cache: false,
 				data: {
@@ -648,6 +659,7 @@
 
 						$.ajax({
 							method: 'POST',
+							dataType: 'JSON',
 							url: ajaxurl + '?do=suki_sites_import__get_plugins_status',
 							cache: false,
 							data: {
