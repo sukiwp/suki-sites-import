@@ -1,6 +1,47 @@
 (function( $ ) {
 	'use strict';
 
+	var sseImport = {
+		counts: {
+			posts: 0,
+			media: 0,
+			comments: 0,
+			terms: 0,
+		},
+		completed: {
+			posts: 0,
+			media: 0,
+			comments: 0,
+			terms: 0,
+		},
+
+		updateDelta: function( type, delta ) {
+			this.completed[ type ] += delta;
+
+			var self = this;
+			requestAnimationFrame(function () {
+				self.render();
+			});
+		},
+		render: function() {
+			var totalCount = 0;
+			var totalCompleted = 0;
+
+			Object.values( this.counts ).forEach( function( count, i ) {
+				totalCount += count;
+			});
+
+			Object.values( this.completed ).forEach( function( count, i ) {
+				totalCompleted += count;
+			});
+
+			var $button = SukiSitesImport.$currentPreview.find( '.suki-sites-import-preview-action-button' );
+
+			var buttonText = SukiSitesImportScriptsData.strings[ 'action_importing_contents' ] + ' (' + Math.round( totalCompleted / totalCount * 100 ) + '%)';
+			$button.html( buttonText );
+		}
+	}
+
 	var SukiSitesImport = {
 
 		currentGridFilters: {},
@@ -233,6 +274,7 @@
 					break;
 
 				case 'activating_pro_modules':
+				case 'preparing_contents':
 				case 'importing_contents':
 				case 'importing_customizer':
 				case 'importing_widgets':
@@ -282,7 +324,7 @@
 				data: {
 					action: 'suki_sites_import__install_plugin',
 					plugin_slug: plugin.slug,
-					_ajax_nonce: SukiSitesImportScriptsData.ajax_nonce,
+					_ajax_nonce: SukiSitesImportScriptsData.nonce,
 				},
 			})
 			.done(function( response, status, XHR ) {
@@ -321,7 +363,7 @@
 				data: {
 					action: 'suki_sites_import__activate_plugin',
 					plugin_path: plugin.path,
-					_ajax_nonce: SukiSitesImportScriptsData.ajax_nonce,
+					_ajax_nonce: SukiSitesImportScriptsData.nonce,
 				},
 			})
 			.done(function( response, status, XHR ) {
@@ -399,7 +441,7 @@
 					data: {
 						action: 'suki_sites_import__activate_pro_modules',
 						pro_modules: SukiSitesImport.currentPreviewInfo.required_pro_modules,
-						_ajax_nonce: SukiSitesImportScriptsData.ajax_nonce,
+						_ajax_nonce: SukiSitesImportScriptsData.nonce,
 					},
 				})
 				.done(function( response, status, XHR ) {
@@ -417,26 +459,73 @@
 		},
 
 		importContents: function() {
-			var log = 'Importing content and media files';
+			var log = 'Preparing Contents XML file';
 			console.log( log );
 
-			SukiSitesImport.changeActionButtonStatus( 'importing_contents' );
+			SukiSitesImport.changeActionButtonStatus( 'preparing_contents' );
 
 			$.ajax({
 				method: 'POST',
 				dataType: 'JSON',
-				url: ajaxurl + '?do=suki_sites_import__import_contents',
+				url: ajaxurl + '?do=suki_sites_import__prepare_contents',
 				cache: false,
 				data: {
-					action: 'suki_sites_import__import_contents',
+					action: 'suki_sites_import__prepare_contents',
 					contents_xml_file_url: SukiSitesImport.currentPreviewInfo.contents_xml_file_url,
-					_ajax_nonce: SukiSitesImportScriptsData.ajax_nonce,
+					_ajax_nonce: SukiSitesImportScriptsData.nonce,
 				},
 			})
 			.done(function( response, status, XHR ) {
 				if ( response.success ) {
-					// Step 3: Importing data from customizer.json.
-					SukiSitesImport.importCustomizer();
+
+					/**
+					 * Importing via SSE
+					 */
+
+					var log = 'Importing content and media files';
+					console.log( log );
+
+					SukiSitesImport.changeActionButtonStatus( 'importing_contents' );
+
+					// Create new EventSource WebAPI instance for processing import via AJAX request.
+					var eventSource = new EventSource( ajaxurl + '?action=suki_sites_import__import_contents&_ajax_nonce=' + SukiSitesImportScriptsData.nonce );
+
+					eventSource.addEventListener( 'message', function( e ) {
+						var data = JSON.parse( e.data );
+						switch ( data.action ) {
+							// Called before import process starts.
+							case 'setCounts':
+								// Update counts info.
+								sseImport.counts = data.counts;
+
+								// Render
+								sseImport.render();
+								break;
+
+							//  Called during the import process to update the progress.
+							case 'updateDelta':
+								sseImport.updateDelta( data.type, data.delta );
+								break;
+
+							// Called when the import process is completed.
+							case 'complete':
+								eventSource.close();
+
+								if ( false === data.error ) {
+									// Step 3: Importing customizer settings.
+									SukiSitesImport.importCustomizer();
+								} else {
+									alert( 'Error: ' + log + '\n' + data.error );
+								}
+								break;
+						}
+					}, false );
+
+					eventSource.addEventListener( 'error', function( e ) {
+						eventSource.close();
+						alert( 'Error: ' + log );
+					}, false );
+
 				} else {
 					alert( 'Error: ' + log + '\n' + response.data );
 				}
@@ -457,7 +546,7 @@
 				data: {
 					action: 'suki_sites_import__import_customizer',
 					customizer_json_file_url: SukiSitesImport.currentPreviewInfo.customizer_json_file_url,
-					_ajax_nonce: SukiSitesImportScriptsData.ajax_nonce,
+					_ajax_nonce: SukiSitesImportScriptsData.nonce,
 				},
 			})
 			.done(function( response, status, XHR ) {
@@ -485,7 +574,7 @@
 				data: {
 					action: 'suki_sites_import__import_widgets',
 					widgets_json_file_url: SukiSitesImport.currentPreviewInfo.widgets_json_file_url,
-					_ajax_nonce: SukiSitesImportScriptsData.ajax_nonce,
+					_ajax_nonce: SukiSitesImportScriptsData.nonce,
 				},
 			})
 			.done(function( response, status, XHR ) {
@@ -512,7 +601,7 @@
 				data: {
 					action: 'suki_sites_import__import_options',
 					options_json_file_url: SukiSitesImport.currentPreviewInfo.options_json_file_url,
-					_ajax_nonce: SukiSitesImportScriptsData.ajax_nonce,
+					_ajax_nonce: SukiSitesImportScriptsData.nonce,
 				},
 			})
 			.done(function( response, status, XHR ) {
@@ -558,7 +647,7 @@
 				data: {
 					action: 'suki_sites_import__select_builder',
 					builder: builder,
-					_ajax_nonce: SukiSitesImportScriptsData.ajax_nonce,
+					_ajax_nonce: SukiSitesImportScriptsData.nonce,
 				},
 			})
 			.done(function( response, status, XHR ) {
@@ -665,7 +754,7 @@
 							data: {
 								action: 'suki_sites_import__get_plugins_status',
 								plugins: data.required_plugins,
-								_ajax_nonce: SukiSitesImportScriptsData.ajax_nonce,
+								_ajax_nonce: SukiSitesImportScriptsData.nonce,
 							},
 						})
 						.done(function( response, status, XHR ) {
@@ -689,7 +778,7 @@
 
 			var close = true;
 
-			if ( -1 < [ 'importing_contents', 'importing_customizer', 'importing_widgets', 'importing_options' ].indexOf( SukiSitesImport.currentPreviewInfo.import_status ) ) {
+			if ( -1 < [ 'preparing_contents', 'importing_contents', 'importing_customizer', 'importing_widgets', 'importing_options' ].indexOf( SukiSitesImport.currentPreviewInfo.import_status ) ) {
 				if ( ! confirm( SukiSitesImportScriptsData.strings.confirm_close_importing ) ) {
 					close = false;
 				}

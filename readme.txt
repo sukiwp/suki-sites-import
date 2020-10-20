@@ -3,7 +3,7 @@ Contributors: sukiwp, daviedr
 Tags: 
 Requires at least: 4.6
 Tested up to: 5.3
-Stable tag: 1.0.4
+Stable tag: 1.1.0-dev
 Requires PHP: 5.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -44,6 +44,11 @@ Yes! We continuously add new demo sites in various categories and niches. You wi
 4. Go to Appearance > Sites Import to see the available demo sites.
 
 == Changelog ==
+
+= v1.1.0 =
+
+* TWEAK: Use Sever Sent Events API for importing contents.
+* FIX: Compatibility for Elementor 3.0.x
 
 = v1.0.4 =
 

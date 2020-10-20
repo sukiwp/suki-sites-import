@@ -69,7 +69,7 @@ class Suki_Sites_Import {
 	public function init() {
 		// Suki theme is installed.
 		if ( defined( 'SUKI_VERSION' ) ) {
-			add_action( 'upload_mimes', array( $this, 'allow_upload_xml' ) );
+			add_action( 'upload_mimes', array( $this, 'add_custom_mimes' ) );
 			add_filter( 'wp_check_filetype_and_ext', array( $this, 'real_mime_type_for_xml' ), 10, 4 );
 
 			add_action( 'suki/admin/menu', array( $this, 'register_admin_menu' ) );
@@ -82,6 +82,7 @@ class Suki_Sites_Import {
 			add_action( 'wp_ajax_suki_sites_import__activate_plugin', array( $this, 'ajax_activate_plugin' ) );
 
 			add_action( 'wp_ajax_suki_sites_import__activate_pro_modules', array( $this, 'ajax_activate_pro_modules' ) );
+			add_action( 'wp_ajax_suki_sites_import__prepare_contents', array( $this, 'ajax_prepare_contents' ) );
 			add_action( 'wp_ajax_suki_sites_import__import_contents', array( $this, 'ajax_import_contents' ) );
 			add_action( 'wp_ajax_suki_sites_import__import_customizer', array( $this, 'ajax_import_customizer' ) );
 			add_action( 'wp_ajax_suki_sites_import__import_widgets', array( $this, 'ajax_import_widgets' ) );
@@ -89,6 +90,10 @@ class Suki_Sites_Import {
 
 			if ( class_exists( 'WooCommerce' ) ) {
 				require_once( SUKI_SITES_IMPORT_DIR . 'inc/compatibilities/class-suki-sites-import-compatibility-woocommerce.php' );
+			}
+
+			if ( class_exists( '\Elementor\Plugin' ) ) {
+				require_once( SUKI_SITES_IMPORT_DIR . 'inc/compatibilities/class-suki-sites-import-compatibility-elementor.php' );
 			}
 		}
 
@@ -99,12 +104,20 @@ class Suki_Sites_Import {
 	}
 
 	/**
-	 * Add .xml files as supported format in the uploader.
+	 * Add custom mimes for the uploader.
 	 *
 	 * @param array $mimes
 	 */
-	public function allow_upload_xml( $mimes ) {
-		$mimes = array_merge( $mimes, array( 'xml' => 'text/xml' ) );
+	public function add_custom_mimes( $mimes ) {
+		// Allow SVG files.
+		$mimes['svg']  = 'image/svg+xml';
+		$mimes['svgz'] = 'image/svg+xml';
+
+		// Allow XML files.
+		$mimes['xml'] = 'text/xml';
+
+		// Allow JSON files.
+		$mimes['json'] = 'application/json';
 
 		return $mimes;
 	}
@@ -154,7 +167,7 @@ class Suki_Sites_Import {
 			wp_localize_script( 'suki-sites-import', 'SukiSitesImportScriptsData', apply_filters( 'suki/sites_import/scripts_data', array(
 				'home_url'           => home_url(),
 				'api_url'            => self::$api_url,
-				'ajax_nonce'         => wp_create_nonce( 'suki-sites-import' ),
+				'nonce'              => wp_create_nonce( 'suki-sites-import' ),
 				'license_key'        => get_option( 'suki_pro_license_key', null ),
 				'selected_builder'   => intval( get_option( 'suki_sites_import_selected_builder' ) ),
 				'strings'            => array(
@@ -169,6 +182,7 @@ class Suki_Sites_Import {
 					'action_ready_to_import'        => esc_html__( 'Import This Site', 'suki-sites-import' ),
 					'action_validating_data'        => esc_html__( 'Validating data...', 'suki-sites-import' ),
 					'action_activating_pro_modules' => esc_html__( 'Activating required modules...', 'suki-sites-import' ),
+					'action_preparing_contents'     => esc_html__( 'Preparing contents...', 'suki-sites-import' ),
 					'action_importing_contents'     => esc_html__( 'Importing contents...', 'suki-sites-import' ),
 					'action_importing_customizer'   => esc_html__( 'Importing theme options...', 'suki-sites-import' ),
 					'action_importing_widgets'      => esc_html__( 'Importing widgets...', 'suki-sites-import' ),
@@ -177,7 +191,7 @@ class Suki_Sites_Import {
 
 					'confirm_import'                => esc_html__( "Before importing this site site, please note:\n\n1. It is recommended to run import on a fresh WordPress installation (no data has been added). You can reset to fresh installation using any \"WordPress reset\" plugin.\n\n2. Importing site site data into a non-fresh installation might overwrite your existing content.\n\n3. Copyrighted media will not be imported and will be replaced with placeholders.\n\n", 'suki-sites-import' ),
 
-					'confirm_close_importing'       => esc_html__( 'Warning! The import process is not finished yet. Don\'t close the window until import process complete, otherwise the imported data might be corrupted. Do you still want to leave the window?', 'suki-sites-import' ),
+					'confirm_close_importing'       => esc_html__( 'Warning! The import process is not finished yet. Do not close the window until import process complete, otherwise the imported data might be corrupted. Do you still want to leave the window?', 'suki-sites-import' ),
 
 					'site_error_invalid'            => esc_html__( 'Failed to fetch site info', 'suki-sites-import' ),
 					'plugin_error_invalid'          => esc_html__( 'Invalid plugin status, please refresh this page.', 'suki-sites-import' ),
@@ -330,9 +344,9 @@ class Suki_Sites_Import {
 	}
 
 	/**
-	 * AJAX callback to import contents and media files from contents.xml.
+	 * AJAX callback to download contents XML file and prepare for importing.
 	 */
-	public function ajax_import_contents() {
+	public function ajax_prepare_contents() {
 		check_ajax_referer( 'suki-sites-import', '_ajax_nonce' );
 
 		if ( ! current_user_can( 'edit_theme_options' ) ) {
@@ -340,9 +354,19 @@ class Suki_Sites_Import {
 		}
 
 		if ( ! isset( $_REQUEST['contents_xml_file_url'] ) ) {
-			wp_send_json_error( esc_html__( 'No XML file specified.', 'suki-sites-import' ) );
+			wp_send_json_error( esc_html__( 'Invalid downloadable XML file URL specified.', 'suki-sites-import' ) );
 		}
 		
+		/**
+		 * Clean up default contents.
+		 */
+
+		// wp_delete_post( 1, true ); // Hello World
+		// wp_delete_post( 2, true ); // Sample Page
+		// wp_delete_post( 3, true ); // Privacy Policy - Draft
+		// wp_delete_post( 4, true ); // Auto Draft
+		// wp_delete_comment( 1, true ); // WordPress comment
+
 		/**
 		 * Download contents.xml
 		 */
@@ -352,8 +376,10 @@ class Suki_Sites_Import {
 			require_once( ABSPATH . 'wp-admin/includes/file.php' );
 		}
 
-		// URL to the WordPress logo
+		// Get the XML file URL.
 		$url = wp_unslash( $_REQUEST['contents_xml_file_url'] );
+
+		// Set timeout.
 		$timeout_seconds = 5;
 
 		// Download file to temp dir
@@ -398,86 +424,62 @@ class Suki_Sites_Import {
 			wp_send_json_error( $download_response['error'] );
 		}
 
-		// Define the downloaded contents.xml file path.
-		$xml_file_path = $download_response['file'];
-
 		/**
-		 * file : "/app/public/wp-content/uploads/2018/08/contents.xml"
-		 * type : "application/xml"
-		 * url : "http://suki.singlestroke.local/wp-content/uploads/2018/08/contents.xml"
+		 * Successfully downloaded, now create an attachment post for the XML file.
 		 */
 
-		/**
-		 * Import content and media files using WXR Importer.
-		 */
+		$post = array(
+			'post_title'     => $file_args['name'],
+			'guid'           => $download_response['url'],
+			'post_mime_type' => $download_response['type'],
+		);
 
-		if ( ! class_exists( 'WP_Importer' ) ) {
-			if ( ! defined( 'WP_LOAD_IMPORTERS' ) ) {
-				define( 'WP_LOAD_IMPORTERS', true );
-			}
-			require_once( ABSPATH . 'wp-admin/includes/class-wp-importer.php' );
-		}
-		if ( ! class_exists( 'WXR_Importer' ) ) {
-			require_once( SUKI_SITES_IMPORT_DIR . 'inc/importers/class-wxr-importer.php' );
-		}
-		if ( ! class_exists( 'WXR_Import_Info' ) ) {
-			require_once( SUKI_SITES_IMPORT_DIR . 'inc/importers/class-wxr-import-info.php' );
-		}
-		if ( ! class_exists( 'WP_Importer_Logger' ) ) {
-			require_once( SUKI_SITES_IMPORT_DIR . 'inc/importers/class-logger.php' );
+		// Create attachment.
+		$post_id = wp_insert_attachment( $post, $download_response['file'] );
+
+		// Error when creating attachment.
+		if ( is_wp_error( $post_id ) ) {
+			wp_send_json_error( esc_html__( 'There was an error downloading the XML file.', 'suki-sites-import' ) );
 		}
 
-		/**
-		 * Prepare the importer.
-		 */
+		// Save currently processed XML file ID in wp_options.
+		update_option( 'suki_sites_import_xml_id', $post_id );
 
-		// Turn off PHP output compression
-		$previous = error_reporting( error_reporting() ^ E_WARNING );
-		ini_set( 'output_buffering', 'off' );
-		ini_set( 'zlib.output_compression', false );
-		error_reporting( $previous );
-
-		// Time to run the import!
-		set_time_limit( 0 );
-
-		// Ensure we're not buffered.
-		wp_ob_end_flush_all();
-		flush();
-
-		// Are we allowed to create users?
-		add_filter( 'wxr_importer.pre_process.user', '__return_null' );
-
-		$importer = new WXR_Importer( array(
-			'fetch_attachments' => true,
-			'default_author'    => get_current_user_id(),
-		) );
-		$logger = new WP_Importer_Logger();
-		$importer->set_logger( $logger );
-		$info = $importer->get_preliminary_information( $xml_file_path );
+		// Update attachment metadata
+		$attachment_metadata = wp_generate_attachment_metadata( $post_id, $download_response['file'] );
+		wp_update_attachment_metadata( $post_id, $attachment_metadata );
 
 		/**
-		 * Clean up default contents.
+		 * Return successful AJAX.
 		 */
 
-		wp_delete_post( 1, true ); // Hello World
-		wp_delete_post( 2, true ); // Sample Page
-		wp_delete_post( 3, true ); // Privacy Policy - Draft
-		wp_delete_post( 4, true ); // Auto Draft
-		wp_delete_comment( 1, true ); // WordPress comment
+		wp_send_json_success();
+	}
+
+	/**
+	 * AJAX callback to import contents and media files from contents.xml.
+	 */
+	public function AJAX_import_contents() {
+		check_admin_referer( 'suki-sites-import', '_ajax_nonce' );
+
+		// Include the importer class.
+		require_once( SUKI_SITES_IMPORT_DIR . 'inc/wxr-importer/class-suki-wxr-importer.php' );
 
 		/**
-		 * Process import.
+		 * Prepare XML.
 		 */
 
-		$import = $importer->import( $xml_file_path );
+		$xml_id = get_option( 'suki_sites_import_xml_id' );
+		$xml_url = get_attached_file( $xml_id );
 
-		if ( is_wp_error( $import ) ) {
-			wp_send_json_error( $import->get_error_message() );
-		}
+		Suki_WXR_Importer::instance()->sse_import( $xml_url );
 
 		/**
-		 * Convert custom link on nav menu item to this domain.
+		 * After completed
 		 */
+		
+		// Clean the XML ID on database.
+		update_option( 'suki_sites_import_xml_id', 0 );
 
 		foreach ( get_terms( array( 'taxonomy' => 'nav_menu' ) ) as $menu ) {
 			foreach ( wp_get_nav_menu_items( $menu->term_id ) as $menu_item ) {
@@ -493,11 +495,7 @@ class Suki_Sites_Import {
 
 		do_action( 'suki/sites_import/after_import_contents' );
 
-		/**
-		 * Return successful AJAX.
-		 */
-
-		wp_send_json_success();
+		exit;
 	}
 
 	/**
