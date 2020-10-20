@@ -146,99 +146,99 @@ msgstr ""
 msgid "Invalid downloadable XML file URL specified."
 msgstr ""
 
-#: inc/class-suki-sites-import.php:442
+#: inc/class-suki-sites-import.php:465
 msgid "There was an error downloading the XML file."
 msgstr ""
 
-#: inc/class-suki-sites-import.php:508
+#: inc/class-suki-sites-import.php:531
 msgid "You are not permitted to import customizer."
 msgstr ""
 
-#: inc/class-suki-sites-import.php:512
+#: inc/class-suki-sites-import.php:535
 msgid "No customizer JSON file specified."
 msgstr ""
 
-#: inc/class-suki-sites-import.php:559
+#: inc/class-suki-sites-import.php:582
 msgid "You are not permitted to import widgets."
 msgstr ""
 
-#: inc/class-suki-sites-import.php:563
+#: inc/class-suki-sites-import.php:586
 msgid "No widgets JSON file specified."
 msgstr ""
 
-#: inc/class-suki-sites-import.php:674
+#: inc/class-suki-sites-import.php:697
 msgid "You are not permitted to import options."
 msgstr ""
 
-#: inc/class-suki-sites-import.php:678
+#: inc/class-suki-sites-import.php:701
 msgid "No options JSON file specified."
 msgstr ""
 
-#: inc/class-suki-sites-import.php:740
+#: inc/class-suki-sites-import.php:763
 msgid "Suki Sites Import (plugin) requires Suki theme to be installed and activated."
 msgstr ""
 
-#: inc/class-suki-sites-import.php:748
+#: inc/class-suki-sites-import.php:771
 msgid "Install and Activate Now"
 msgstr ""
 
-#: inc/class-suki-sites-import.php:745
+#: inc/class-suki-sites-import.php:768
 msgid "Activate Now"
 msgstr ""
 
-#: inc/class-suki-sites-import.php:789
+#: inc/class-suki-sites-import.php:812
 msgid "Show All"
 msgstr ""
 
-#: inc/class-suki-sites-import.php:795
+#: inc/class-suki-sites-import.php:818
 msgid "Search site sites"
 msgstr ""
 
-#: inc/class-suki-sites-import.php:796
+#: inc/class-suki-sites-import.php:819
 msgid "or enter keywords..."
 msgstr ""
 
-#: inc/class-suki-sites-import.php:808
+#: inc/class-suki-sites-import.php:831
 msgid "Details & Preview"
 msgstr ""
 
-#: inc/class-suki-sites-import.php:810
+#: inc/class-suki-sites-import.php:833
 msgid "Pro"
 msgstr ""
 
-#: inc/class-suki-sites-import.php:818
+#: inc/class-suki-sites-import.php:841
 msgid "Select your page builder."
 msgstr ""
 
-#: inc/class-suki-sites-import.php:823
+#: inc/class-suki-sites-import.php:846
 msgid "No site found. Try a different search."
 msgstr ""
 
-#: inc/class-suki-sites-import.php:831
+#: inc/class-suki-sites-import.php:854
 msgid "Close"
 msgstr ""
 
-#: inc/class-suki-sites-import.php:844
+#: inc/class-suki-sites-import.php:867
 msgid "Pro Demo Site"
 msgstr ""
 
-#: inc/class-suki-sites-import.php:845
+#: inc/class-suki-sites-import.php:868
 msgid "To import this demo site you need an active license of {{ data.license_plan.name }} plan. Please upgrade or renew your license first."
 msgstr ""
 
-#: inc/class-suki-sites-import.php:846
+#: inc/class-suki-sites-import.php:869
 msgid "If you already have an active license, please install the Suki Pro plugin and activate your license on \"Appearance > Suki\" page."
 msgstr ""
 
-#: inc/class-suki-sites-import.php:855
+#: inc/class-suki-sites-import.php:878
 msgid "Required Plugins"
 msgstr ""
 
-#: inc/class-suki-sites-import.php:885
+#: inc/class-suki-sites-import.php:908
 msgid "Preview"
 msgstr ""
 
-#: inc/class-suki-sites-import.php:894
+#: inc/class-suki-sites-import.php:917
 msgid "Load More"
 msgstr ""
 

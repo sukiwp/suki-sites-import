@@ -367,6 +367,29 @@ class Suki_Sites_Import {
 		// wp_delete_post( 4, true ); // Auto Draft
 		// wp_delete_comment( 1, true ); // WordPress comment
 
+		// Remove "Hello World" post.
+		$posts = get_posts( array(
+			'name' => 'hello-world',
+			'post_type' => 'post',
+			'posts_per_page' => 1,
+		) );
+		if ( 0 < count( $posts ) ) {
+			wp_delete_post( $posts[0]->ID, true );
+		}
+
+		// Remove "Sample Page" page.
+		$posts = get_posts( array(
+			'name' => 'sample-page',
+			'post_type' => 'page',
+			'posts_per_page' => 1,
+		) );
+		if ( 0 < count( $posts ) ) {
+			wp_delete_post( $posts[0]->ID, true );
+		}
+
+		// Remove default comment.
+		wp_delete_comment( 1, true );
+
 		/**
 		 * Download contents.xml
 		 */
