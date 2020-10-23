@@ -433,7 +433,7 @@ class Suki_Sites_Import {
 		}
 
 		// Get the XML file URL.
-		$url = wp_unslash( $_REQUEST['contents_xml_file_url'] );
+		$url = wp_unslash( $data['contents_xml_file_url'] );
 
 		// Set timeout.
 		$timeout_seconds = 5;
