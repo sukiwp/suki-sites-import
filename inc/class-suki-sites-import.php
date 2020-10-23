@@ -81,7 +81,6 @@ class Suki_Sites_Import {
 			add_action( 'wp_ajax_suki_sites_import__install_plugin', array( $this, 'ajax_install_plugin' ) );
 			add_action( 'wp_ajax_suki_sites_import__activate_plugin', array( $this, 'ajax_activate_plugin' ) );
 
-			// add_action( 'wp_ajax_suki_sites_import__activate_pro_modules', array( $this, 'ajax_activate_pro_modules' ) );
 			add_action( 'wp_ajax_suki_sites_import__prepare_import', array( $this, 'ajax_prepare_import' ) );
 			add_action( 'wp_ajax_suki_sites_import__prepare_contents', array( $this, 'ajax_prepare_contents' ) );
 			add_action( 'wp_ajax_suki_sites_import__import_contents', array( $this, 'ajax_import_contents' ) );
@@ -328,11 +327,23 @@ class Suki_Sites_Import {
 	public function ajax_prepare_import() {
 		check_ajax_referer( 'suki-sites-import', '_ajax_nonce' );
 
-		$data = $_REQUEST['data'];
+		if ( ! isset( $_REQUEST['data'] ) ) {
+			wp_send_json_error( esc_html__( 'No import info provided.', 'suki-sites-import' ) );
+		}
 
 		/**
 		 * Save info into database.
 		 */
+
+		$data = wp_parse_args( $_REQUEST['data'], array(
+			'slug'                     => '',
+			'required_plugins'         => '',
+			'required_pro_modules'     => '',
+			'contents_xml_file_url'    => '',
+			'customizer_json_file_url' => '',
+			'widgets_json_file_url'    => '',
+			'options_json_file_url'    => '',
+		) );
 
 		update_option( 'suki_sites_import_demo_info', $data );
 
