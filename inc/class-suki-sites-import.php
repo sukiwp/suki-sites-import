@@ -327,7 +327,7 @@ class Suki_Sites_Import {
 	public function ajax_prepare_import() {
 		check_ajax_referer( 'suki-sites-import', '_ajax_nonce' );
 
-		if ( ! isset( $_REQUEST['data'] ) ) {
+		if ( ! isset( $_REQUEST['info'] ) ) {
 			wp_send_json_error( esc_html__( 'No import info provided.', 'suki-sites-import' ) );
 		}
 
@@ -335,7 +335,7 @@ class Suki_Sites_Import {
 		 * Save info into database.
 		 */
 
-		$data = wp_parse_args( $_REQUEST['data'], array(
+		$data = wp_parse_args( $_REQUEST['info'], array(
 			'slug'                     => '',
 			'required_plugins'         => '',
 			'required_pro_modules'     => '',
@@ -384,7 +384,9 @@ class Suki_Sites_Import {
 			wp_send_json_error( esc_html__( 'You are not permitted to import contents.', 'suki-sites-import' ) );
 		}
 
-		if ( ! isset( $_REQUEST['contents_xml_file_url'] ) ) {
+		$data = get_option( 'suki_sites_import_demo_info', array() );
+
+		if ( ! isset( $data['contents_xml_file_url'] ) ) {
 			wp_send_json_error( esc_html__( 'Invalid downloadable XML file URL specified.', 'suki-sites-import' ) );
 		}
 

@@ -440,7 +440,7 @@
 				cache: false,
 				data: {
 					action: 'suki_sites_import__prepare_import',
-					data: {
+					info: {
 						slug: SukiSitesImport.currentPreviewInfo.slug,
 						required_plugins: SukiSitesImport.currentPreviewInfo.required_plugins,
 						required_pro_modules: SukiSitesImport.currentPreviewInfo.required_pro_modules,
