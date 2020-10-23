@@ -621,10 +621,10 @@
 			$.ajax({
 				method: 'POST',
 				dataType: 'JSON',
-				url: ajaxurl + '?do=suki_sites_import__finalizing_import',
+				url: ajaxurl + '?do=suki_sites_import__finalize_import',
 				cache: false,
 				data: {
-					action: 'suki_sites_import__finalizing_import',
+					action: 'suki_sites_import__finalize_import',
 					_ajax_nonce: SukiSitesImportScriptsData.nonce,
 				},
 			})
