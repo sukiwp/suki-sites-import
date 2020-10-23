@@ -88,6 +88,7 @@ class Suki_Sites_Import {
 			add_action( 'wp_ajax_suki_sites_import__import_customizer', array( $this, 'ajax_import_customizer' ) );
 			add_action( 'wp_ajax_suki_sites_import__import_widgets', array( $this, 'ajax_import_widgets' ) );
 			add_action( 'wp_ajax_suki_sites_import__import_options', array( $this, 'ajax_import_options' ) );
+			add_action( 'wp_ajax_suki_sites_import__finalize_import', array( $this, 'ajax_finalize_import' ) );
 
 			if ( class_exists( 'WooCommerce' ) ) {
 				require_once( SUKI_SITES_IMPORT_DIR . 'inc/compatibilities/class-suki-sites-import-compatibility-woocommerce.php' );
@@ -187,6 +188,7 @@ class Suki_Sites_Import {
 					'action_importing_customizer'   => esc_html__( 'Importing theme options...', 'suki-sites-import' ),
 					'action_importing_widgets'      => esc_html__( 'Importing widgets...', 'suki-sites-import' ),
 					'action_importing_options'      => esc_html__( 'Importing other options...', 'suki-sites-import' ),
+					'action_finalizing_import'      => esc_html__( 'Finalizing import...', 'suki-sites-import' ),
 					'action_finished'               => esc_html__( 'Finished! Visit your site', 'suki-sites-import' ),
 
 					'confirm_import'                => esc_html__( "Before importing this site site, please note:\n\n1. It is recommended to run import on a fresh WordPress installation (no data has been added). You can reset to fresh installation using any \"WordPress reset\" plugin.\n\n2. Importing site site data into a non-fresh installation might overwrite your existing content.\n\n3. Copyrighted media will not be imported and will be replaced with placeholders.\n\n", 'suki-sites-import' ),
@@ -506,7 +508,7 @@ class Suki_Sites_Import {
 	/**
 	 * AJAX callback to import contents and media files from contents.xml.
 	 */
-	public function AJAX_import_contents() {
+	public function ajax_import_contents() {
 		check_admin_referer( 'suki-sites-import', '_ajax_nonce' );
 
 		// Include the importer class.
@@ -565,7 +567,9 @@ class Suki_Sites_Import {
 			wp_send_json_error( esc_html__( 'You are not permitted to import customizer.', 'suki-sites-import' ) );
 		}
 
-		if ( ! isset( $_REQUEST['customizer_json_file_url'] ) ) {
+		$data = get_option( 'suki_sites_import_demo_info', array() );
+
+		if ( ! isset( $data['customizer_json_file_url'] ) ) {
 			wp_send_json_error( esc_html__( 'No customizer JSON file specified.', 'suki-sites-import' ) );
 		}
 
@@ -574,7 +578,7 @@ class Suki_Sites_Import {
 		 */
 
 		// Get JSON data from customizer.json
-		$raw = wp_remote_get( wp_unslash( $_REQUEST['customizer_json_file_url'] ) );
+		$raw = wp_remote_get( wp_unslash( $data['customizer_json_file_url'] ) );
 
 		// Abort if customizer.json response code is not successful.
 		if ( 200 != wp_remote_retrieve_response_code( $raw ) ) {
@@ -622,7 +626,9 @@ class Suki_Sites_Import {
 			wp_send_json_error( esc_html__( 'You are not permitted to import widgets.', 'suki-sites-import' ) );
 		}
 
-		if ( ! isset( $_REQUEST['widgets_json_file_url'] ) ) {
+		$data = get_option( 'suki_sites_import_demo_info', array() );
+
+		if ( ! isset( $data['widgets_json_file_url'] ) ) {
 			wp_send_json_error( esc_html__( 'No widgets JSON file specified.', 'suki-sites-import' ) );
 		}
 
@@ -631,7 +637,7 @@ class Suki_Sites_Import {
 		 */
 
 		// Get JSON data from widgets.json
-		$raw = wp_remote_get( wp_unslash( $_REQUEST['widgets_json_file_url'] ) );
+		$raw = wp_remote_get( wp_unslash( $data['widgets_json_file_url'] ) );
 
 		// Abort if customizer.json response code is not successful.
 		if ( 200 != wp_remote_retrieve_response_code( $raw ) ) {
@@ -743,7 +749,9 @@ class Suki_Sites_Import {
 			wp_send_json_error( esc_html__( 'You are not permitted to import options.', 'suki-sites-import' ) );
 		}
 
-		if ( ! isset( $_REQUEST['options_json_file_url'] ) ) {
+		$data = get_option( 'suki_sites_import_demo_info', array() );
+
+		if ( ! isset( $data['options_json_file_url'] ) ) {
 			wp_send_json_error( esc_html__( 'No options JSON file specified.', 'suki-sites-import' ) );
 		}
 
@@ -752,7 +760,7 @@ class Suki_Sites_Import {
 		 */
 
 		// Get JSON data from options.json
-		$raw = wp_remote_get( wp_unslash( $_REQUEST['options_json_file_url'] ) );
+		$raw = wp_remote_get( wp_unslash( $data['options_json_file_url'] ) );
 
 		// Abort if customizer.json response code is not successful.
 		if ( 200 != wp_remote_retrieve_response_code( $raw ) ) {
@@ -790,6 +798,31 @@ class Suki_Sites_Import {
 		 */
 
 		do_action( 'suki/sites_import/after_import_options', $array );
+
+		/**
+		 * Return successful AJAX.
+		 */
+
+		wp_send_json_success();
+	}
+
+	/**
+	 * AJAX callback to finalize anything after the import run.
+	 */
+	public function ajax_finalize_import() {
+		check_ajax_referer( 'suki-sites-import', '_ajax_nonce' );
+
+		/**
+		 * Reset info in database.
+		 */
+
+		update_option( 'suki_sites_import_demo_info', array() );
+
+		/**
+		 * Action hook.
+		 */
+
+		do_action( 'suki/sites_import/finalize_import', $array );
 
 		/**
 		 * Return successful AJAX.

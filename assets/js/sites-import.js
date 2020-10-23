@@ -279,6 +279,7 @@
 				case 'importing_customizer':
 				case 'importing_widgets':
 				case 'importing_options':
+				case 'finalizing_import':
 					isDisabled = true;
 					addClass = 'button-secondary installing disabled';
 					break;
@@ -427,7 +428,7 @@
 		},
 
 		preparingImport: function() {
-			var log = 'Preparing import.';
+			var log = 'Preparing import';
 			console.log( log );
 
 			SukiSitesImport.changeActionButtonStatus( 'preparing_import' );
@@ -603,7 +604,33 @@
 			})
 			.done(function( response, status, XHR ) {
 				if ( response.success ) {
-					// Step 6: Finished!
+					// Step 6: Finalizing import.
+					SukiSitesImport.finalizeImport();
+				} else {
+					alert( 'Error: ' + log + '\n' + response.data );
+				}
+			});
+		},
+
+		finalizeImport: function() {
+			var log = 'Finalizing import';
+			console.log( log );
+
+			SukiSitesImport.changeActionButtonStatus( 'finalizing_import' );
+
+			$.ajax({
+				method: 'POST',
+				dataType: 'JSON',
+				url: ajaxurl + '?do=suki_sites_import__finalizing_import',
+				cache: false,
+				data: {
+					action: 'suki_sites_import__finalizing_import',
+					_ajax_nonce: SukiSitesImportScriptsData.nonce,
+				},
+			})
+			.done(function( response, status, XHR ) {
+				if ( response.success ) {
+					// Finished!
 					SukiSitesImport.changeActionButtonStatus( 'finished' );
 
 					window.removeEventListener( 'beforeunload', SukiSitesImport.confirmTabClosing );
