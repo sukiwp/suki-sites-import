@@ -81,7 +81,8 @@ class Suki_Sites_Import {
 			add_action( 'wp_ajax_suki_sites_import__install_plugin', array( $this, 'ajax_install_plugin' ) );
 			add_action( 'wp_ajax_suki_sites_import__activate_plugin', array( $this, 'ajax_activate_plugin' ) );
 
-			add_action( 'wp_ajax_suki_sites_import__activate_pro_modules', array( $this, 'ajax_activate_pro_modules' ) );
+			// add_action( 'wp_ajax_suki_sites_import__activate_pro_modules', array( $this, 'ajax_activate_pro_modules' ) );
+			add_action( 'wp_ajax_suki_sites_import__prepare_import', array( $this, 'ajax_prepare_import' ) );
 			add_action( 'wp_ajax_suki_sites_import__prepare_contents', array( $this, 'ajax_prepare_contents' ) );
 			add_action( 'wp_ajax_suki_sites_import__import_contents', array( $this, 'ajax_import_contents' ) );
 			add_action( 'wp_ajax_suki_sites_import__import_customizer', array( $this, 'ajax_import_customizer' ) );
@@ -181,8 +182,7 @@ class Suki_Sites_Import {
 					'action_plugins_not_active'     => esc_html__( 'Please Activate Required Plugins', 'suki-sites-import' ),
 					'action_ready_to_import'        => esc_html__( 'Import This Site', 'suki-sites-import' ),
 					'action_validating_data'        => esc_html__( 'Validating data...', 'suki-sites-import' ),
-					'action_activating_pro_modules' => esc_html__( 'Activating required modules...', 'suki-sites-import' ),
-					'action_preparing_contents'     => esc_html__( 'Preparing contents...', 'suki-sites-import' ),
+					'action_preparing_import'       => esc_html__( 'Preparing import', 'suki-sites-import' ),
 					'action_importing_contents'     => esc_html__( 'Importing contents...', 'suki-sites-import' ),
 					'action_importing_customizer'   => esc_html__( 'Importing theme options...', 'suki-sites-import' ),
 					'action_importing_widgets'      => esc_html__( 'Importing widgets...', 'suki-sites-import' ),
@@ -321,24 +321,42 @@ class Suki_Sites_Import {
 	}
 
 	/**
-	 * AJAX callback to activate all required Suki Pro modules.
+	 * AJAX callback to prepare anything before the import run.
 	 */
-	public function ajax_activate_pro_modules() {
+	public function ajax_prepare_import() {
 		check_ajax_referer( 'suki-sites-import', '_ajax_nonce' );
 
-		if ( ! current_user_can( 'edit_theme_options' ) ) {
-			wp_send_json_error( esc_html__( 'You are not permitted to install plugins.', 'suki-sites-import' ) );
-		}
+		$data = $_REQUEST['data'];
 
-		if ( isset( $_REQUEST['pro_modules'] ) && is_array( $_REQUEST['pro_modules'] ) ) {
+		/**
+		 * Save info into database.
+		 */
+
+		update_option( 'suki_sites_import_demo_info', $data );
+
+		/**
+		 * Activate pro modules (if any)
+		 */
+
+		if ( isset( $data['required_pro_modules'] ) && is_array( $data['required_pro_modules'] ) ) {
 			$slugs = array();
 
-			foreach ( $_REQUEST['pro_modules'] as $key => $module ) {
+			foreach ( $data['required_pro_modules'] as $key => $module ) {
 				$slugs[] = $module['slug'];
 			}
 
 			update_option( 'suki_pro_active_modules', $slugs );
 		}
+
+		/**
+		 * Action hook.
+		 */
+
+		do_action( 'suki/sites_import/prepare_import', $data );
+
+		/**
+		 * Return successful AJAX.
+		 */
 
 		wp_send_json_success();
 	}
@@ -356,16 +374,16 @@ class Suki_Sites_Import {
 		if ( ! isset( $_REQUEST['contents_xml_file_url'] ) ) {
 			wp_send_json_error( esc_html__( 'Invalid downloadable XML file URL specified.', 'suki-sites-import' ) );
 		}
+
+		/**
+		 * Action hook.
+		 */
+
+		do_action( 'suki/sites_import/before_prepare_contents' );
 		
 		/**
 		 * Clean up default contents.
 		 */
-
-		// wp_delete_post( 1, true ); // Hello World
-		// wp_delete_post( 2, true ); // Sample Page
-		// wp_delete_post( 3, true ); // Privacy Policy - Draft
-		// wp_delete_post( 4, true ); // Auto Draft
-		// wp_delete_comment( 1, true ); // WordPress comment
 
 		// Remove "Hello World" post.
 		$posts = get_posts( array(
@@ -473,6 +491,12 @@ class Suki_Sites_Import {
 		wp_update_attachment_metadata( $post_id, $attachment_metadata );
 
 		/**
+		 * Action hook.
+		 */
+
+		do_action( 'suki/sites_import/after_prepare_contents' );
+
+		/**
 		 * Return successful AJAX.
 		 */
 
@@ -494,6 +518,16 @@ class Suki_Sites_Import {
 
 		$xml_id = get_option( 'suki_sites_import_xml_id' );
 		$xml_url = get_attached_file( $xml_id );
+
+		/**
+		 * Action hook.
+		 */
+
+		do_action( 'suki/sites_import/before_import_contents' );
+
+		/**
+		 * Run importer.
+		 */
 
 		Suki_WXR_Importer::instance()->sse_import( $xml_url );
 
@@ -552,6 +586,12 @@ class Suki_Sites_Import {
 
 		// Parse any dynamic values on the values array.
 		$array = $this->parse_dynamic_values( $array );
+
+		/**
+		 * Action hook.
+		 */
+
+		do_action( 'suki/sites_import/before_import_customizer', $array );
 
 		/**
 		 * Import customizer settings to DB.
@@ -660,6 +700,12 @@ class Suki_Sites_Import {
 		}
 
 		/**
+		 * Action hook.
+		 */
+
+		do_action( 'suki/sites_import/before_import_widgets', $sidebar_widgets, $widget_instances );
+
+		/**
 		 * Import widgets to DB.
 		 */
 
@@ -718,6 +764,12 @@ class Suki_Sites_Import {
 
 		// Parse any dynamic values on the values array.
 		$array = $this->parse_dynamic_values( $array );
+
+		/**
+		 * Action hook.
+		 */
+
+		do_action( 'suki/sites_import/before_import_options', $array );
 
 		/**
 		 * Import options to DB.

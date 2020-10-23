@@ -40,7 +40,7 @@
 			var buttonText = SukiSitesImportScriptsData.strings[ 'action_importing_contents' ] + ' (' + Math.round( totalCompleted / totalCount * 100 ) + '%)';
 			$button.html( buttonText );
 		}
-	}
+	};
 
 	var SukiSitesImport = {
 
@@ -273,7 +273,7 @@
 					addClass = 'button-primary';
 					break;
 
-				case 'activating_pro_modules':
+				case 'preparing_resources':
 				case 'preparing_contents':
 				case 'importing_contents':
 				case 'importing_customizer':
@@ -418,51 +418,54 @@
 			})
 			.done(function( response, status, XHR ) {
 				if ( status ) {
-					// Step 1: Activate required Suki Pro modules.
-					SukiSitesImport.activateProModules();
+					// Step 1: Preparing import.
+					SukiSitesImport.preparingImport();
 				} else {
 					alert( 'Error: ' + log + '\n' + response.data );
 				}
 			});
 		},
 
-		activateProModules: function() {
-			var log = 'Activating required Suki Pro modules.';
+		preparingImport: function() {
+			var log = 'Preparing import.';
 			console.log( log );
 
-			if ( 0 < SukiSitesImport.currentPreviewInfo.required_pro_modules.length ) {
-				SukiSitesImport.changeActionButtonStatus( 'activating_pro_modules' );
+			SukiSitesImport.changeActionButtonStatus( 'preparing_import' );
 
-				$.ajax({
-					method: 'POST',
-					dataType: 'JSON',
-					url: ajaxurl + '?do=suki_sites_import__activate_pro_modules',
-					cache: false,
+			$.ajax({
+				method: 'POST',
+				dataType: 'JSON',
+				url: ajaxurl + '?do=suki_sites_import__prepare_import',
+				cache: false,
+				data: {
+					action: 'suki_sites_import__prepare_import',
 					data: {
-						action: 'suki_sites_import__activate_pro_modules',
-						pro_modules: SukiSitesImport.currentPreviewInfo.required_pro_modules,
-						_ajax_nonce: SukiSitesImportScriptsData.nonce,
+						slug: SukiSitesImport.currentPreviewInfo.slug,
+						required_plugins: SukiSitesImport.currentPreviewInfo.required_plugins,
+						required_pro_modules: SukiSitesImport.currentPreviewInfo.required_pro_modules,
+						contents_xml_file_url: SukiSitesImport.currentPreviewInfo.contents_xml_file_url,
+						customizer_json_file_url: SukiSitesImport.currentPreviewInfo.customizer_json_file_url,
+						widgets_json_file_url: SukiSitesImport.currentPreviewInfo.widgets_json_file_url,
+						options_json_file_url: SukiSitesImport.currentPreviewInfo.options_json_file_url,
 					},
-				})
-				.done(function( response, status, XHR ) {
-					if ( status ) {
-						// Step 2: Importing data from contents.xml.
-						SukiSitesImport.importContents();
-					} else {
-						alert( 'Error: ' + log + '\n' + response.data );
-					}
-				});
-			} else {
-				// Step 2: Importing data from contents.xml.
-				SukiSitesImport.importContents();
-			}
+					_ajax_nonce: SukiSitesImportScriptsData.nonce,
+				},
+			})
+			.done(function( response, status, XHR ) {
+				if ( status ) {
+					// Step 2: Importing data from contents.xml.
+					SukiSitesImport.importContents();
+				} else {
+					alert( 'Error: ' + log + '\n' + response.data );
+				}
+			});
 		},
 
 		importContents: function() {
 			var log = 'Preparing Contents XML file';
 			console.log( log );
 
-			SukiSitesImport.changeActionButtonStatus( 'preparing_contents' );
+			SukiSitesImport.changeActionButtonStatus( 'importing_contents' );
 
 			$.ajax({
 				method: 'POST',
@@ -471,7 +474,6 @@
 				cache: false,
 				data: {
 					action: 'suki_sites_import__prepare_contents',
-					contents_xml_file_url: SukiSitesImport.currentPreviewInfo.contents_xml_file_url,
 					_ajax_nonce: SukiSitesImportScriptsData.nonce,
 				},
 			})
@@ -484,8 +486,6 @@
 
 					var log = 'Importing content and media files';
 					console.log( log );
-
-					SukiSitesImport.changeActionButtonStatus( 'importing_contents' );
 
 					// Create new EventSource WebAPI instance for processing import via AJAX request.
 					var eventSource = new EventSource( ajaxurl + '?action=suki_sites_import__import_contents&_ajax_nonce=' + SukiSitesImportScriptsData.nonce );
@@ -545,7 +545,6 @@
 				cache: false,
 				data: {
 					action: 'suki_sites_import__import_customizer',
-					customizer_json_file_url: SukiSitesImport.currentPreviewInfo.customizer_json_file_url,
 					_ajax_nonce: SukiSitesImportScriptsData.nonce,
 				},
 			})
@@ -573,7 +572,6 @@
 				cache: false,
 				data: {
 					action: 'suki_sites_import__import_widgets',
-					widgets_json_file_url: SukiSitesImport.currentPreviewInfo.widgets_json_file_url,
 					_ajax_nonce: SukiSitesImportScriptsData.nonce,
 				},
 			})
@@ -600,7 +598,6 @@
 				cache: false,
 				data: {
 					action: 'suki_sites_import__import_options',
-					options_json_file_url: SukiSitesImport.currentPreviewInfo.options_json_file_url,
 					_ajax_nonce: SukiSitesImportScriptsData.nonce,
 				},
 			})
