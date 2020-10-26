@@ -39,7 +39,13 @@ class Suki_Sites_Import_Compatibility_WooCommerce {
 	 * Class constructor
 	 */
 	protected function __construct() {
+		// Disable setup wizard (prior WooCommerce 4.6).
 		add_filter( 'woocommerce_enable_setup_wizard', '__return_false' );
+
+		// Disable automatic pages creation (since WooCommerce 4.6).
+		add_filter( 'woocommerce_create_pages', '__return_empty_array' );
+
+		// Create product attributes before importing contents.
 		add_action( 'suki/sites_import/prepare_import', array( $this, 'import_product_attributes' ) );
 	}
 	

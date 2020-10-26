@@ -802,7 +802,7 @@
 
 			var close = true;
 
-			if ( -1 < [ 'preparing_contents', 'importing_contents', 'importing_customizer', 'importing_widgets', 'importing_options' ].indexOf( SukiSitesImport.currentPreviewInfo.import_status ) ) {
+			if ( -1 < [ 'preparing_import', 'preparing_contents', 'importing_contents', 'importing_customizer', 'importing_widgets', 'importing_options' ].indexOf( SukiSitesImport.currentPreviewInfo.import_status ) ) {
 				if ( ! confirm( SukiSitesImportScriptsData.strings.confirm_close_importing ) ) {
 					close = false;
 				}

@@ -312,6 +312,8 @@ class Suki_Sites_Import {
 			wp_send_json_error();
 		}
 
+		wp_clean_plugins_cache();
+
 		$activate = activate_plugin( $_REQUEST['plugin_path'], '', false, true );
 
 		if ( is_wp_error( $activate ) ) {
