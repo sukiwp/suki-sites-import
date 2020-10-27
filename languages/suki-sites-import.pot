@@ -230,15 +230,23 @@ msgstr ""
 msgid "If you already have an active license, please install the Suki Pro plugin and activate your license on \"Appearance > Suki\" page."
 msgstr ""
 
+#: inc/class-suki-sites-import.php:977
+msgid "Make sure you disable the \"debug\" mode because it may disrupt the import process."
+msgstr ""
+
 #: inc/class-suki-sites-import.php:978
+msgid "Learn how to disable debug mode"
+msgstr ""
+
+#: inc/class-suki-sites-import.php:985
 msgid "Required Plugins"
 msgstr ""
 
-#: inc/class-suki-sites-import.php:1008
+#: inc/class-suki-sites-import.php:1015
 msgid "Preview"
 msgstr ""
 
-#: inc/class-suki-sites-import.php:1017
+#: inc/class-suki-sites-import.php:1024
 msgid "Load More"
 msgstr ""
 

@@ -972,6 +972,13 @@ class Suki_Sites_Import {
 									break;
 								
 								default:
+									#>
+									<div class="suki-sites-import-preview-notice notice inline notice-alt notice-warning">
+										<p><?php esc_html_e( 'Make sure you disable the "debug" mode because it may disrupt the import process.', 'suki-sites-import' ); ?></p>
+										<p><a href="https://codex.wordpress.org/WP_DEBUG" target="_blank" rel="noopener"><?php esc_html_e( 'Learn how to disable debug mode', 'suki-sites-import' ); ?></a></p>
+									</div>
+									<#
+
 									if ( 0 < data.required_plugins.length ) {
 										#>
 										<div class="suki-sites-import-preview-required-plugins">

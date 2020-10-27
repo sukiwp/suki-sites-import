@@ -47,7 +47,9 @@ Yes! We continuously add new demo sites in various categories and niches. You wi
 
 = v1.1.0 =
 
-* TWEAK: Use Sever Sent Events API for importing contents.
+* NEW: Use Sever Sent Events API for importing contents.
+* TWEAK: Disable automatic WooCommerce pages creation to avoid duplicate pages when importing (since WooCommerce 4.6).
+* TWEAK: Add warning notice to disable WP_DEBUG mode.
 * FIX: Compatibility for Elementor 3.0.x
 
 = v1.0.4 =
