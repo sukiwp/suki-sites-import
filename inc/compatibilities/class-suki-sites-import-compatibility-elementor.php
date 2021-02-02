@@ -50,6 +50,12 @@ class Suki_Sites_Import_Compatibility_Elementor {
 			add_filter( 'wp_import_post_meta', array( $this, 'on_wp_import_post_meta' ) );
 			add_filter( 'wxr_importer.pre_process.post_meta', array( $this, 'on_wxr_importer_pre_process_post_meta' ) );
 		}
+
+		/**
+		 * Delete auto generated default kit which controls Global Colors and Typography on Elementor.
+		 * since Elementor 3.5
+		 */
+		add_action( 'suki/sites_import/before_import_contents', array( $this, 'delete_auto_generated_kit' ) );
 	}
 	
 	/**
@@ -115,6 +121,16 @@ class Suki_Sites_Import_Compatibility_Elementor {
 		}
 
 		return $post_meta;
+	}
+
+	/**
+	 * Delete auto generated default kit which controls Global Colors and Typography on Elementor.
+	 *
+	 * Our contents.xml contains the default kit, so we need to delete the auto generated one before import our kit.
+	 */
+	public function delete_auto_generated_kit() {
+		wp_delete_post( get_option( 'elementor_active_kit' ) );
+		update_option( 'elementor_active_kit', 0 );
 	}
 }
 
