@@ -69,6 +69,8 @@ class Suki_Sites_Import {
 	public function init() {
 		// Suki theme is installed.
 		if ( defined( 'SUKI_VERSION' ) ) {
+			add_filter( 'suki/sites_import/scripts_data', array( $this, 'check_dev_mode' ) );
+
 			add_action( 'upload_mimes', array( $this, 'add_custom_mimes' ) );
 			add_filter( 'wp_check_filetype_and_ext', array( $this, 'real_mime_type_for_xml' ), 10, 4 );
 
@@ -102,6 +104,19 @@ class Suki_Sites_Import {
 		else {
 			add_action( 'admin_notices', array( $this, 'render_theme_not_installed_motice' ) );
 		}
+	}
+
+	/**
+	 * Check if we are in development mode, pass a flag status to the javascript via `localize_script` variable.
+	 *
+	 * @return boolean
+	 */
+	public function check_dev_mode( $array ) {
+		if ( defined( 'SUKI_DEVELOPMENT_MODE' ) && SUKI_DEVELOPMENT_MODE ) {
+			$array['dev_mode'] = true;
+		}
+
+		return $array;
 	}
 
 	/**

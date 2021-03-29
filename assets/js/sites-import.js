@@ -151,8 +151,9 @@
 				license_key: SukiSitesImportScriptsData.license_key,
 			}, SukiSitesImport.currentGridFilters );
 
-			if ( SukiSitesImportScriptsData.demo_status ) {
-				args.demo_status = SukiSitesImportScriptsData.demo_status;
+			// Whether to include dev_mode
+			if ( SukiSitesImportScriptsData.dev_mode ) {
+				args.dev_mode = 1;
 			}
 
 			var $loadMoreButton = SukiSitesImport.$container.find( '.suki-sites-import-load-more' );
@@ -399,8 +400,9 @@
 				license_key: SukiSitesImportScriptsData.license_key,
 			}, SukiSitesImport.currentGridFilters );
 			
-			if ( SukiSitesImportScriptsData.demo_status ) {
-				args.demo_status = SukiSitesImportScriptsData.demo_status;
+			// Whether to include dev_mode
+			if ( SukiSitesImportScriptsData.dev_mode ) {
+				args.dev_mode = 1;
 			}
 
 			var queryString = '';
