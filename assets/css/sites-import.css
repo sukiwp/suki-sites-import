@@ -99,13 +99,10 @@
 }
 
 .suki-sites-import-wrap .suki-sites-import-preview .suki-sites-import-preview-required-plugins ul li {
-	display: -webkit-box;
 	display: -ms-flexbox;
 	display: flex;
-	-webkit-box-pack: justify;
 	-ms-flex-pack: justify;
 	justify-content: space-between;
-	-webkit-box-align: start;
 	-ms-flex-align: start;
 	align-items: flex-start;
 	margin: 10px 0;

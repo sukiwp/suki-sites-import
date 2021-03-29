@@ -38,10 +38,10 @@
 		"gulp-uglifycss": "^1.1.0",
 		"gulp-watch": "^5.0.1",
 		"gulp-wp-pot": "^2.5.0",
-		"gulp-zip": "^5.0.2"
+		"gulp-zip": "^5.1.0"
 	},
 	"browserslist": [
-		"last 2 versions",
+		"last 1 version",
 		"ie >= 10"
 	],
 	"dependencies": {}
