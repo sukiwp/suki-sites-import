@@ -129,8 +129,15 @@ class Suki_Sites_Import_Compatibility_Elementor {
 	 * Our contents.xml contains the default kit, so we need to delete the auto generated one before import our kit.
 	 */
 	public function delete_auto_generated_kit() {
-		wp_delete_post( get_option( 'elementor_active_kit' ) );
+		// Add query argument to bypass Elementor's delete confirmation.
+		$_GET['force_delete_kit'] = true;
+
+		// Delete the default generated kit.
+		wp_delete_post( get_option( 'elementor_active_kit' ), 1 );
 		update_option( 'elementor_active_kit', 0 );
+		
+		// Remove the query argument again.
+		$_GET['force_delete_kit'] = null;
 	}
 }
 
