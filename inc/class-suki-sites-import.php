@@ -1,11 +1,18 @@
 <?php
 /**
  * Main class of Suki Sites Import plugin.
+ *
+ * @package Suki Sites Import
  */
 
 // Prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
+/**
+ * Plugin Class
+ */
 class Suki_Sites_Import {
 
 	/**
@@ -49,7 +56,7 @@ class Suki_Sites_Import {
 		add_action( 'plugins_loaded', array( $this, 'load_plugin_textdomain' ) );
 		add_action( 'after_setup_theme', array( $this, 'init' ) );
 	}
-	
+
 	/**
 	 * ====================================================
 	 * Hook functions
@@ -67,7 +74,8 @@ class Suki_Sites_Import {
 	 * Initialize plugin (required Suki theme to be active).
 	 */
 	public function init() {
-		// Suki theme is installed.
+		// Check if Suki theme is installed.
+		// If not, don't run the plugin and show an warning message on admin page.
 		if ( defined( 'SUKI_VERSION' ) ) {
 			add_filter( 'suki/sites_import/scripts_data', array( $this, 'check_dev_mode' ) );
 
@@ -92,16 +100,13 @@ class Suki_Sites_Import {
 			add_action( 'wp_ajax_suki_sites_import__finalize_import', array( $this, 'ajax_finalize_import' ) );
 
 			if ( class_exists( 'WooCommerce' ) ) {
-				require_once( SUKI_SITES_IMPORT_DIR . 'inc/compatibilities/class-suki-sites-import-compatibility-woocommerce.php' );
+				require_once trailingslashit( SUKI_SITES_IMPORT_INCLUDES_DIR ) . 'compatibilities/class-suki-sites-import-compatibility-woocommerce.php';
 			}
 
 			if ( class_exists( '\Elementor\Plugin' ) ) {
-				require_once( SUKI_SITES_IMPORT_DIR . 'inc/compatibilities/class-suki-sites-import-compatibility-elementor.php' );
+				require_once trailingslashit( SUKI_SITES_IMPORT_INCLUDES_DIR ) . 'compatibilities/class-suki-sites-import-compatibility-elementor.php';
 			}
-		}
-
-		// Suki theme is not installed.
-		else {
+		} else {
 			add_action( 'admin_notices', array( $this, 'render_theme_not_installed_motice' ) );
 		}
 	}
@@ -109,20 +114,22 @@ class Suki_Sites_Import {
 	/**
 	 * Check if we are in development mode, pass a flag status to the javascript via `localize_script` variable.
 	 *
+	 * @param array $data The scripts data array.
 	 * @return boolean
 	 */
-	public function check_dev_mode( $array ) {
+	public function check_dev_mode( $data ) {
 		if ( defined( 'SUKI_DEVELOPMENT_MODE' ) && SUKI_DEVELOPMENT_MODE ) {
-			$array['dev_mode'] = true;
+			$data['dev_mode'] = true;
 		}
 
-		return $array;
+		return $data;
 	}
 
 	/**
 	 * Add custom mimes for the uploader.
 	 *
-	 * @param array $mimes
+	 * @param array $mimes MIME types.
+	 * @return array
 	 */
 	public function add_custom_mimes( $mimes ) {
 		// Allow SVG files.
@@ -141,14 +148,15 @@ class Suki_Sites_Import {
 	/**
 	 * Filters the "real" file type of the given file.
 	 *
-	 * @param array $wp_check_filetype_and_ext
-	 * @param string $file
-	 * @param string $filename
-	 * @param array $mimes
+	 * @param array  $wp_check_filetype_and_ext File info.
+	 * @param string $file File.
+	 * @param string $filename File name.
+	 * @param array  $mimes MIME types.
+	 * @return array
 	 */
 	public function real_mime_type_for_xml( $wp_check_filetype_and_ext, $file, $filename, $mimes ) {
 		if ( '.xml' === substr( $filename, -4 ) ) {
-			$wp_check_filetype_and_ext['ext'] = 'xml';
+			$wp_check_filetype_and_ext['ext']  = 'xml';
 			$wp_check_filetype_and_ext['type'] = 'text/xml';
 		}
 
@@ -171,50 +179,57 @@ class Suki_Sites_Import {
 	/**
 	 * Enqueue custom scripts on site import page.
 	 *
-	 * @param string $hook
+	 * @param string $hook_suffix Current admin page's slug.
 	 */
-	public function enqueue_scripts( $hook ) {
-		if ( 'appearance_page_suki-sites-import' === $hook ) {
+	public function enqueue_scripts( $hook_suffix ) {
+		if ( 'appearance_page_suki-sites-import' === $hook_suffix ) {
 			$suffix = SCRIPT_DEBUG ? '' : '.min';
 
 			wp_enqueue_style( 'suki-sites-import', SUKI_SITES_IMPORT_URI . 'assets/css/sites-import' . $suffix . '.css', array(), SUKI_SITES_IMPORT_VERSION );
 
 			wp_enqueue_script( 'suki-sites-import', SUKI_SITES_IMPORT_URI . 'assets/js/sites-import' . $suffix . '.js', array( 'jquery', 'wp-util', 'updates' ), SUKI_SITES_IMPORT_VERSION, true );
-			wp_localize_script( 'suki-sites-import', 'SukiSitesImportScriptsData', apply_filters( 'suki/sites_import/scripts_data', array(
-				'home_url'           => home_url(),
-				'api_url'            => self::$api_url,
-				'nonce'              => wp_create_nonce( 'suki-sites-import' ),
-				'license_key'        => get_option( 'suki_pro_license_key', null ),
-				'selected_builder'   => intval( get_option( 'suki_sites_import_selected_builder' ) ),
-				'strings'            => array(
-					'plugin_not_installed'          => esc_html__( 'Install & Activate', 'suki-sites-import' ),
-					'plugin_installing'             => esc_html__( 'Installing', 'suki-sites-import' ),
-					'plugin_inactive'               => esc_html__( 'Activate', 'suki-sites-import' ),
-					'plugin_activating'             => esc_html__( 'Activating', 'suki-sites-import' ),
-					'plugin_active'                 => esc_html__( 'Active', 'suki-sites-import' ),
+			wp_localize_script(
+				'suki-sites-import',
+				'SukiSitesImportScriptsData',
+				apply_filters(
+					'suki/sites_import/scripts_data',
+					array(
+						'home_url'         => home_url(),
+						'api_url'          => self::$api_url,
+						'nonce'            => wp_create_nonce( 'suki-sites-import' ),
+						'license_key'      => get_option( 'suki_pro_license_key', null ),
+						'selected_builder' => intval( get_option( 'suki_sites_import_selected_builder' ) ),
+						'strings'          => array(
+							'plugin_not_installed'        => esc_html__( 'Install & Activate', 'suki-sites-import' ),
+							'plugin_installing'           => esc_html__( 'Installing', 'suki-sites-import' ),
+							'plugin_inactive'             => esc_html__( 'Activate', 'suki-sites-import' ),
+							'plugin_activating'           => esc_html__( 'Activating', 'suki-sites-import' ),
+							'plugin_active'               => esc_html__( 'Active', 'suki-sites-import' ),
 
-					'action_upgrade_required'       => esc_html__( 'Upgrade Your License', 'suki-sites-import' ),
-					'action_plugins_not_active'     => esc_html__( 'Please Activate Required Plugins', 'suki-sites-import' ),
-					'action_ready_to_import'        => esc_html__( 'Import This Site', 'suki-sites-import' ),
-					'action_validating_data'        => esc_html__( 'Validating data...', 'suki-sites-import' ),
-					'action_preparing_import'       => esc_html__( 'Preparing import', 'suki-sites-import' ),
-					'action_importing_contents'     => esc_html__( 'Importing contents...', 'suki-sites-import' ),
-					'action_importing_customizer'   => esc_html__( 'Importing theme options...', 'suki-sites-import' ),
-					'action_importing_widgets'      => esc_html__( 'Importing widgets...', 'suki-sites-import' ),
-					'action_importing_options'      => esc_html__( 'Importing other options...', 'suki-sites-import' ),
-					'action_finalizing_import'      => esc_html__( 'Finalizing import...', 'suki-sites-import' ),
-					'action_finished'               => esc_html__( 'Finished! Visit your site', 'suki-sites-import' ),
+							'action_upgrade_required'     => esc_html__( 'Upgrade Your License', 'suki-sites-import' ),
+							'action_plugins_not_active'   => esc_html__( 'Please Activate Required Plugins', 'suki-sites-import' ),
+							'action_ready_to_import'      => esc_html__( 'Import This Site', 'suki-sites-import' ),
+							'action_validating_data'      => esc_html__( 'Validating data...', 'suki-sites-import' ),
+							'action_preparing_import'     => esc_html__( 'Preparing import', 'suki-sites-import' ),
+							'action_importing_contents'   => esc_html__( 'Importing contents...', 'suki-sites-import' ),
+							'action_importing_customizer' => esc_html__( 'Importing theme options...', 'suki-sites-import' ),
+							'action_importing_widgets'    => esc_html__( 'Importing widgets...', 'suki-sites-import' ),
+							'action_importing_options'    => esc_html__( 'Importing other options...', 'suki-sites-import' ),
+							'action_finalizing_import'    => esc_html__( 'Finalizing import...', 'suki-sites-import' ),
+							'action_finished'             => esc_html__( 'Finished! Visit your site', 'suki-sites-import' ),
 
-					'confirm_import'                => esc_html__( "Before importing this site site, please note:\n\n1. It is recommended to run import on a fresh WordPress installation (no data has been added). You can reset to fresh installation using any \"WordPress reset\" plugin.\n\n2. Importing site site data into a non-fresh installation might overwrite your existing content.\n\n3. Copyrighted media will not be imported and will be replaced with placeholders.\n\n", 'suki-sites-import' ),
+							'confirm_import'              => esc_html__( "Before importing this site site, please note:\n\n1. It is recommended to run import on a fresh WordPress installation (no data has been added). You can reset to fresh installation using any \"WordPress reset\" plugin.\n\n2. Importing site site data into a non-fresh installation might overwrite your existing content.\n\n3. Copyrighted media will not be imported and will be replaced with placeholders.\n\n", 'suki-sites-import' ),
 
-					'confirm_close_importing'       => esc_html__( 'Warning! The import process is not finished yet. Do not close the window until import process complete, otherwise the imported data might be corrupted. Do you still want to leave the window?', 'suki-sites-import' ),
+							'confirm_close_importing'     => esc_html__( 'Warning! The import process is not finished yet. Do not close the window until import process complete, otherwise the imported data might be corrupted. Do you still want to leave the window?', 'suki-sites-import' ),
 
-					'site_error_invalid'            => esc_html__( 'Failed to fetch site info', 'suki-sites-import' ),
-					'plugin_error_invalid'          => esc_html__( 'Invalid plugin status, please refresh this page.', 'suki-sites-import' ),
-					'action_error_invalid'          => esc_html__( 'Invalid action, please refresh this page.', 'suki-sites-import' ),
-					'import_error_invalid'          => esc_html__( 'Invalid requirements for importing, please refresh this page.', 'suki-sites-import' ),
-				),
-			) ) );
+							'site_error_invalid'          => esc_html__( 'Failed to fetch site info', 'suki-sites-import' ),
+							'plugin_error_invalid'        => esc_html__( 'Invalid plugin status, please refresh this page.', 'suki-sites-import' ),
+							'action_error_invalid'        => esc_html__( 'Invalid action, please refresh this page.', 'suki-sites-import' ),
+							'import_error_invalid'        => esc_html__( 'Invalid requirements for importing, please refresh this page.', 'suki-sites-import' ),
+						),
+					)
+				)
+			);
 		}
 	}
 
@@ -234,8 +249,8 @@ class Suki_Sites_Import {
 			wp_send_json_error();
 		}
 
-		update_option( 'suki_sites_import_selected_builder', $_REQUEST['builder'] );
-		
+		update_option( 'suki_sites_import_selected_builder', sanitize_text_field( wp_unslash( $_REQUEST['builder'] ) ) );
+
 		wp_send_json_success();
 	}
 
@@ -251,18 +266,16 @@ class Suki_Sites_Import {
 
 		$response = array();
 
-		foreach ( $_REQUEST['plugins'] as $i => $plugin ) {
+		foreach ( array_map( 'sanitize_text_field', wp_unslash( $_REQUEST['plugins'] ) ) as $i => $plugin ) {
 			if ( ! file_exists( WP_PLUGIN_DIR . '/' . $plugin['path'] ) ) {
 				$response[ $i ] = 'not_installed';
-			}
-			elseif ( is_plugin_active( $plugin['path'] ) ) {
+			} elseif ( is_plugin_active( $plugin['path'] ) ) {
 				$response[ $i ] = 'active';
-			}
-			else {
+			} else {
 				$response[ $i ] = 'inactive';
 			}
 		}
-		
+
 		wp_send_json_success( $response );
 	}
 
@@ -277,29 +290,29 @@ class Suki_Sites_Import {
 		}
 
 		if ( ! function_exists( 'plugins_api' ) ) {
-			require_once( ABSPATH . 'wp-admin/includes/plugin-install.php' );
+			require_once ABSPATH . 'wp-admin/includes/plugin-install.php';
 		}
 		if ( ! class_exists( 'WP_Upgrader' ) ) {
-			require_once( ABSPATH . 'wp-admin/includes/class-wp-upgrader.php' );
+			require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
 		}
 
 		$api = plugins_api(
 			'plugin_information',
 			array(
-				'slug' => $_REQUEST['plugin_slug'],
+				'slug'   => sanitize_text_field( wp_unslash( $_REQUEST['plugin_slug'] ) ),
 				'fields' => array(
 					'short_description' => false,
-					'sections' => false,
-					'requires' => false,
-					'rating' => false,
-					'ratings' => false,
-					'downloaded' => false,
-					'last_updated' => false,
-					'added' => false,
-					'tags' => false,
-					'compatibility' => false,
-					'homepage' => false,
-					'donate_link' => false,
+					'sections'          => false,
+					'requires'          => false,
+					'rating'            => false,
+					'ratings'           => false,
+					'downloaded'        => false,
+					'last_updated'      => false,
+					'added'             => false,
+					'tags'              => false,
+					'compatibility'     => false,
+					'homepage'          => false,
+					'donate_link'       => false,
 				),
 			)
 		);
@@ -329,7 +342,7 @@ class Suki_Sites_Import {
 
 		wp_clean_plugins_cache();
 
-		$activate = activate_plugin( $_REQUEST['plugin_path'], '', false, true );
+		$activate = activate_plugin( sanitize_text_field( wp_unslash( $_REQUEST['plugin_path'] ) ), '', false, true );
 
 		if ( is_wp_error( $activate ) ) {
 			wp_send_json_error();
@@ -352,15 +365,18 @@ class Suki_Sites_Import {
 		 * Save info into database.
 		 */
 
-		$data = wp_parse_args( $_REQUEST['info'], array(
-			'slug'                     => '',
-			'required_plugins'         => '',
-			'required_pro_modules'     => '',
-			'contents_xml_file_url'    => '',
-			'customizer_json_file_url' => '',
-			'widgets_json_file_url'    => '',
-			'options_json_file_url'    => '',
-		) );
+		$data = wp_parse_args(
+			array_map( 'sanitize_text_field', wp_unslash( $_REQUEST['info'] ) ),
+			array(
+				'slug'                     => '',
+				'required_plugins'         => '',
+				'required_pro_modules'     => '',
+				'contents_xml_file_url'    => '',
+				'customizer_json_file_url' => '',
+				'widgets_json_file_url'    => '',
+				'options_json_file_url'    => '',
+			)
+		);
 
 		update_option( 'suki_sites_import_demo_info', $data );
 
@@ -412,27 +428,31 @@ class Suki_Sites_Import {
 		 */
 
 		do_action( 'suki/sites_import/before_prepare_contents' );
-		
+
 		/**
 		 * Clean up default contents.
 		 */
 
 		// Remove "Hello World" post.
-		$posts = get_posts( array(
-			'name' => 'hello-world',
-			'post_type' => 'post',
-			'posts_per_page' => 1,
-		) );
+		$posts = get_posts(
+			array(
+				'name'           => 'hello-world',
+				'post_type'      => 'post',
+				'posts_per_page' => 1,
+			)
+		);
 		if ( 0 < count( $posts ) ) {
 			wp_delete_post( $posts[0]->ID, true );
 		}
 
 		// Remove "Sample Page" page.
-		$posts = get_posts( array(
-			'name' => 'sample-page',
-			'post_type' => 'page',
-			'posts_per_page' => 1,
-		) );
+		$posts = get_posts(
+			array(
+				'name'           => 'sample-page',
+				'post_type'      => 'page',
+				'posts_per_page' => 1,
+			)
+		);
 		if ( 0 < count( $posts ) ) {
 			wp_delete_post( $posts[0]->ID, true );
 		}
@@ -444,9 +464,9 @@ class Suki_Sites_Import {
 		 * Download contents.xml
 		 */
 
-		// Gives us access to the download_url() and wp_handle_sideload() functions
+		// Gives us access to the download_url() and wp_handle_sideload() functions.
 		if ( ! function_exists( 'download_url' ) ) {
-			require_once( ABSPATH . 'wp-admin/includes/file.php' );
+			require_once ABSPATH . 'wp-admin/includes/file.php';
 		}
 
 		// Get the XML file URL.
@@ -455,7 +475,7 @@ class Suki_Sites_Import {
 		// Set timeout.
 		$timeout_seconds = 5;
 
-		// Download file to temp dir
+		// Download file to temp dir.
 		$temp_file = download_url( $url, $timeout_seconds );
 
 		if ( is_wp_error( $temp_file ) ) {
@@ -518,7 +538,7 @@ class Suki_Sites_Import {
 		// Save currently processed XML file ID in wp_options.
 		update_option( 'suki_sites_import_xml_id', $post_id );
 
-		// Update attachment metadata
+		// Update attachment metadata.
 		$attachment_metadata = wp_generate_attachment_metadata( $post_id, $download_response['file'] );
 		wp_update_attachment_metadata( $post_id, $attachment_metadata );
 
@@ -542,13 +562,13 @@ class Suki_Sites_Import {
 		check_admin_referer( 'suki-sites-import', '_ajax_nonce' );
 
 		// Include the importer class.
-		require_once( SUKI_SITES_IMPORT_DIR . 'inc/wxr-importer/class-suki-wxr-importer.php' );
+		require_once trailingslashit( SUKI_SITES_IMPORT_INCLUDES_DIR ) . 'wxr-importer/class-suki-wxr-importer.php';
 
 		/**
 		 * Prepare XML.
 		 */
 
-		$xml_id = get_option( 'suki_sites_import_xml_id' );
+		$xml_id  = get_option( 'suki_sites_import_xml_id' );
 		$xml_url = get_attached_file( $xml_id );
 
 		/**
@@ -566,7 +586,7 @@ class Suki_Sites_Import {
 		/**
 		 * After completed
 		 */
-		
+
 		// Clean the XML ID on database.
 		update_option( 'suki_sites_import_xml_id', 0 );
 
@@ -607,11 +627,11 @@ class Suki_Sites_Import {
 		 * Process customizer.json.
 		 */
 
-		// Get JSON data from customizer.json
+		// Get JSON data from customizer.json.
 		$raw = wp_remote_get( wp_unslash( $data['customizer_json_file_url'] ) );
 
 		// Abort if customizer.json response code is not successful.
-		if ( 200 != wp_remote_retrieve_response_code( $raw ) ) {
+		if ( 200 !== wp_remote_retrieve_response_code( $raw ) ) {
 			wp_send_json_error();
 		}
 
@@ -666,11 +686,11 @@ class Suki_Sites_Import {
 		 * Process widgets.json.
 		 */
 
-		// Get JSON data from widgets.json
+		// Get JSON data from widgets.json.
 		$raw = wp_remote_get( wp_unslash( $data['widgets_json_file_url'] ) );
 
 		// Abort if customizer.json response code is not successful.
-		if ( 200 != wp_remote_retrieve_response_code( $raw ) ) {
+		if ( 200 !== wp_remote_retrieve_response_code( $raw ) ) {
 			wp_send_json_error();
 		}
 
@@ -685,12 +705,12 @@ class Suki_Sites_Import {
 		 */
 
 		$registered_widgets = array();
-		
+
 		global $wp_registered_widget_controls;
 
 		foreach ( $wp_registered_widget_controls as $widget ) {
 			// Add widget to available list.
-			if ( ! empty( $widget['id_base'] ) && ! in_array( $widget['id_base'], $registered_widgets ) ) {
+			if ( ! empty( $widget['id_base'] ) && ! in_array( $widget['id_base'], $registered_widgets, true ) ) {
 				$registered_widgets[] = $widget['id_base'];
 			}
 		}
@@ -726,7 +746,7 @@ class Suki_Sites_Import {
 				$sidebar_widgets[ $sidebar_id ][] = $widget_instance_id;
 
 				// Break down the widget instance id into widget slug and instance number.
-				$widget_slug = preg_replace( '/-[0-9]+$/', '', $widget_instance_id );
+				$widget_slug     = preg_replace( '/-[0-9]+$/', '', $widget_instance_id );
 				$instance_number = str_replace( $widget_slug . '-', '', $widget_instance_id );
 
 				// Add instance to the "widget_instances" array.
@@ -752,7 +772,7 @@ class Suki_Sites_Import {
 			// Sort widget instances.
 			ksort( $widget_instances[ $widget_slug ], SORT_STRING );
 
-			// Import widget instances to DB
+			// Import widget instances to DB.
 			update_option( 'widget_' . $widget_slug, $instances );
 		}
 
@@ -774,7 +794,7 @@ class Suki_Sites_Import {
 	 */
 	public function ajax_import_options() {
 		check_ajax_referer( 'suki-sites-import', '_ajax_nonce' );
-		
+
 		if ( ! current_user_can( 'edit_theme_options' ) ) {
 			wp_send_json_error( esc_html__( 'You are not permitted to import options.', 'suki-sites-import' ) );
 		}
@@ -789,11 +809,11 @@ class Suki_Sites_Import {
 		 * Process options.json.
 		 */
 
-		// Get JSON data from options.json
+		// Get JSON data from options.json.
 		$raw = wp_remote_get( wp_unslash( $data['options_json_file_url'] ) );
 
 		// Abort if customizer.json response code is not successful.
-		if ( 200 != wp_remote_retrieve_response_code( $raw ) ) {
+		if ( 200 !== wp_remote_retrieve_response_code( $raw ) ) {
 			wp_send_json_error();
 		}
 
@@ -816,7 +836,7 @@ class Suki_Sites_Import {
 		foreach ( $array as $key => $value ) {
 			// Skip option key with "__" prefix, because it will be treated specifically via the action hook.
 			if ( '__' === substr( $key, 0, 2 ) ) {
-				continue;	
+				continue;
 			}
 
 			// Insert to options table.
@@ -879,14 +899,14 @@ class Suki_Sites_Import {
 
 				$theme = wp_get_theme( 'suki' );
 				if ( $theme->exists() ) {
-					$url = esc_url( add_query_arg( 'theme', 'suki', admin_url( 'themes.php' ) ) );
+					$url   = esc_url( add_query_arg( 'theme', 'suki', admin_url( 'themes.php' ) ) );
 					$label = esc_html__( 'Activate Now', 'suki-sites-import' );
 				} else {
-					$url = esc_url( add_query_arg( 'search', 'suki', admin_url( 'theme-install.php' ) ) );
+					$url   = esc_url( add_query_arg( 'search', 'suki', admin_url( 'theme-install.php' ) ) );
 					$label = esc_html__( 'Install and Activate Now', 'suki-sites-import' );
 				}
-				
-				echo '&nbsp;&nbsp;<a class="button button-secondary" href="' . $url . '" style="margin: -0.5em 0;">' . $label . '</a>'; // WPCS: XSS OK.
+
+				echo '&nbsp;&nbsp;<a class="button button-secondary" href="' . $url . '" style="margin: -0.5em 0;">' . $label . '</a>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				?>
 			</p>
 		</div>
@@ -899,18 +919,18 @@ class Suki_Sites_Import {
 	public function render_admin_page() {
 		?>
 		<div class="wrap suki-sites-import-wrap">
-			<h1><?php echo get_admin_page_title(); ?></h1>
+			<h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
 			<hr class="wp-header-end">
 
-			<div class="wp-filter hide-if-no-js"><?php // Site filters (populated via JS) ?></div>
+			<div class="wp-filter hide-if-no-js"><?php // Site filters (populated via JS). ?></div>
 
 			<div class="theme-browser rendered">
-				<div class="themes wp-clearfix"><?php // Queried site grid (populated via JS) ?></div>
+				<div class="themes wp-clearfix"><?php // Queried site grid (populated via JS). ?></div>
 			</div>
 
 			<span class="spinner"></span>
 
-			<?php // Preview popup (populated via JS) ?>
+			<?php // Preview popup (populated via JS). ?>
 		</div>
 
 		<!-- JS Template: filters. -->
@@ -985,7 +1005,7 @@ class Suki_Sites_Import {
 									</div>
 									<#
 									break;
-								
+
 								default:
 									#>
 									<div class="suki-sites-import-preview-notice notice inline notice-alt notice-warning">
@@ -1052,95 +1072,99 @@ class Suki_Sites_Import {
 	/**
 	 * Parse dynamic values from the specified associative array.
 	 *
-	 * @param array $array
+	 * @param array $values Values array.
+	 * @return array
 	 */
-	public function parse_dynamic_values( $array ) {
-		foreach ( $array as $key => $value ) {
+	public function parse_dynamic_values( $values ) {
+		foreach ( $values as $key => $value ) {
 			// Check the value recursively on an array value.
 			if ( is_array( $value ) ) {
-				$array[ $key ] = $this->parse_dynamic_values( $value );
+				$values[ $key ] = $this->parse_dynamic_values( $value );
+				continue;
 			}
 
 			// Process the value.
-			else {
-				$matches = array();
+			$matches = array();
 
-				// Try to parse dynamic value syntax.
-				$is_dynamic = preg_match( '/\[\[(.*?)\?(.*?)\]\]/', $value, $matches );
+			// Try to parse dynamic value syntax.
+			$is_dynamic = preg_match( '/\[\[(.*?)\?(.*?)\]\]/', $value, $matches );
 
-				// Process dynamic value.
-				if ( $is_dynamic && 3 === count( $matches ) ) {
-					$query_type = $matches[1];
-					$query_args = wp_parse_args( $matches[2] );
+			// Process dynamic value.
+			if ( $is_dynamic && 3 === count( $matches ) ) {
+				$query_type = $matches[1];
+				$query_args = wp_parse_args( $matches[2] );
 
-					switch ( $query_type ) {
-						case 'post_id':
-							if ( isset( $query_args['post_type'] ) && isset( $query_args['slug'] ) ) {
-								$posts = get_posts( array(
-									'name' => $query_args['slug'],
-									'post_type' => $query_args['post_type'],
+				switch ( $query_type ) {
+					case 'post_id':
+						if ( isset( $query_args['post_type'] ) && isset( $query_args['slug'] ) ) {
+							$posts = get_posts(
+								array(
+									'name'           => $query_args['slug'],
+									'post_type'      => $query_args['post_type'],
 									'posts_per_page' => 1,
-								) );
+								)
+							);
 
-								if ( 0 < count( $posts ) ) {
-									$array[ $key ] = (integer) $posts[0]->ID;
-								} else {
-									$array[ $key ] = -1;
-								}
+							if ( 0 < count( $posts ) ) {
+								$values[ $key ] = (int) $posts[0]->ID;
 							} else {
-								$array[ $key ] = -1;
+								$values[ $key ] = -1;
 							}
-							break;
+						} else {
+							$values[ $key ] = -1;
+						}
+						break;
 
-						case 'term_id':
-							if ( isset( $query_args['taxonomy'] ) && isset( $query_args['slug'] ) ) {
-								$term = get_term_by( 'slug', $query_args['slug'], $query_args['taxonomy'] );
+					case 'term_id':
+						if ( isset( $query_args['taxonomy'] ) && isset( $query_args['slug'] ) ) {
+							$term = get_term_by( 'slug', $query_args['slug'], $query_args['taxonomy'] );
 
-								if ( $term ) {
-									$array[ $key ] = (integer) $term->term_id;
-								} else {
-									$array[ $key ] = -1;
-								}
+							if ( $term ) {
+								$values[ $key ] = (int) $term->term_id;
 							} else {
-								$array[ $key ] = -1;
+								$values[ $key ] = -1;
 							}
-							break;
+						} else {
+							$values[ $key ] = -1;
+						}
+						break;
 
-						case 'attachment_url':
-							if ( isset( $query_args['slug'] ) ) {
-								$posts = get_posts( array(
-									'name' => $query_args['slug'],
-									'post_type' => 'attachment',
-									'post_status' => 'inherit',
+					case 'attachment_url':
+						if ( isset( $query_args['slug'] ) ) {
+							$posts = get_posts(
+								array(
+									'name'           => $query_args['slug'],
+									'post_type'      => 'attachment',
+									'post_status'    => 'inherit',
 									'posts_per_page' => 1,
-								) );
+								)
+							);
 
-								if ( 0 < count( $posts ) ) {
-									$image_info = wp_get_attachment_image_src( $posts[0]->ID, isset( $query_args['size'] ) ? $query_args['size'] : 'full' );
-									if ( false !== $image_info ) {
-										$array[ $key ] = $image_info[0]; // Image URL
-									} else {
-										$array[ $key ] = '';
-									}
+							if ( 0 < count( $posts ) ) {
+								$image_info = wp_get_attachment_image_src( $posts[0]->ID, isset( $query_args['size'] ) ? $query_args['size'] : 'full' );
+								if ( false !== $image_info ) {
+									$values[ $key ] = $image_info[0]; // Image URL.
 								} else {
-									$array[ $key ] = '';
+									$values[ $key ] = '';
 								}
 							} else {
-								$array[ $key ] = '';
+								$values[ $key ] = '';
 							}
-							break;
+						} else {
+							$values[ $key ] = '';
+						}
+						break;
 
-						case 'home_url':
-							if ( isset( $query_args['uri'] ) ) {
-								$array[ $key ] = untrailingslashit( home_url() ) . $query_args['uri'];
-							}
-							break;
-					}
+					case 'home_url':
+						if ( isset( $query_args['uri'] ) ) {
+							$values[ $key ] = untrailingslashit( home_url() ) . $query_args['uri'];
+						}
+						break;
 				}
 			}
 		}
 
-		return $array;
+		return $values;
 	}
 }
 

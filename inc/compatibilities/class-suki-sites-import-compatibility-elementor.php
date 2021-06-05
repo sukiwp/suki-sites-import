@@ -2,12 +2,17 @@
 /**
  * Plugin compatibility: Elementor
  *
- * @package Suki
+ * @package Suki Sites Import
  */
 
 // Prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
+/**
+ * Elementor Compatibility Class
+ */
 class Suki_Sites_Import_Compatibility_Elementor {
 
 	/**
@@ -57,7 +62,7 @@ class Suki_Sites_Import_Compatibility_Elementor {
 		 */
 		add_action( 'suki/sites_import/before_import_contents', array( $this, 'delete_auto_generated_kit' ) );
 	}
-	
+
 	/**
 	 * ====================================================
 	 * Hook functions
@@ -135,7 +140,7 @@ class Suki_Sites_Import_Compatibility_Elementor {
 		// Delete the default generated kit.
 		wp_delete_post( get_option( 'elementor_active_kit' ), 1 );
 		update_option( 'elementor_active_kit', 0 );
-		
+
 		// Remove the query argument again.
 		$_GET['force_delete_kit'] = null;
 	}

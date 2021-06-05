@@ -1,18 +1,18 @@
 <?php
 /**
- * Import Log ServerSendEvents
+ * WordPress Importer
+ * https://github.com/humanmade/WordPress-Importer
  *
- * @since 2.0.0
+ * Released under the GNU General Public License v2.0
+ * https://github.com/humanmade/WordPress-Importer/blob/master/LICENSE
  *
- * @package Astra Sites
+ * @package WordPress Importer
  */
 
 if ( ! class_exists( 'WP_Importer_Logger_ServerSentEvents' ) && class_exists( 'WP_Importer_Logger' ) ) {
 
 	/**
-	 * Import Log ServerSendEvents
-	 *
-	 * @since 2.0.0
+	 * Importer Logger ServerSendEvents Class
 	 */
 	class WP_Importer_Logger_ServerSentEvents extends WP_Importer_Logger {
 

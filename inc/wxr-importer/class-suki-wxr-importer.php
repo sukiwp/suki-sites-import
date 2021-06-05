@@ -1,13 +1,20 @@
 <?php
 /**
  * Class that connects the plugin with WXR Importer library.
+ *
+ * @package Suki Sites Import
  */
 
 // Prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
+/**
+ * WXR Importer Class
+ */
 class Suki_WXR_Importer {
-	
+
 	/**
 	 * Singleton instance
 	 *
@@ -43,19 +50,19 @@ class Suki_WXR_Importer {
 		 */
 
 		if ( ! class_exists( 'WP_Importer' ) ) {
-			require_once( ABSPATH . 'wp-admin/includes/class-wp-importer.php' );
+			require_once ABSPATH . 'wp-admin/includes/class-wp-importer.php';
 		}
 		if ( ! class_exists( 'WP_Importer_Logger' ) ) {
-			require_once( SUKI_SITES_IMPORT_DIR . 'inc/wxr-importer/class-wp-importer-logger.php' );
+			require_once trailingslashit( SUKI_SITES_IMPORT_INCLUDES_DIR ) . 'wxr-importer/class-wp-importer-logger.php';
 		}
 		if ( ! class_exists( 'WP_Importer_Logger_ServerSentEvents' ) ) {
-			require_once( SUKI_SITES_IMPORT_DIR . 'inc/wxr-importer/class-wp-importer-logger-serversentevents.php' );
+			require_once trailingslashit( SUKI_SITES_IMPORT_INCLUDES_DIR ) . 'wxr-importer/class-wp-importer-logger-serversentevents.php';
 		}
 		if ( ! class_exists( 'WXR_Importer' ) ) {
-			require_once( SUKI_SITES_IMPORT_DIR . 'inc/wxr-importer/class-wxr-importer.php' );
+			require_once trailingslashit( SUKI_SITES_IMPORT_INCLUDES_DIR ) . 'wxr-importer/class-wxr-importer.php';
 		}
 		if ( ! class_exists( 'WXR_Import_Info' ) ) {
-			require_once( SUKI_SITES_IMPORT_DIR . 'inc/wxr-importer/class-wxr-import-info.php' );
+			require_once trailingslashit( SUKI_SITES_IMPORT_INCLUDES_DIR ) . 'wxr-importer/class-wxr-import-info.php';
 		}
 
 		/**
@@ -65,7 +72,7 @@ class Suki_WXR_Importer {
 		// Are we allowed to create users?
 		add_filter( 'wxr_importer.pre_process.user', '__return_null' );
 
-		// Modify post data
+		// Modify post data.
 		add_filter( 'wp_import_post_data_processed', array( $this, 'replace_guid' ), 10, 2 );
 
 		add_action( 'wxr_importer.processed.post', array( $this, 'imported_post' ), 10, 2 );
@@ -84,7 +91,7 @@ class Suki_WXR_Importer {
 	/**
 	 * Main function to run the import process.
 	 *
-	 * @param string $xml_url
+	 * @param string $xml_url The XML file URL.
 	 * @since 1.1.0
 	 */
 	public function sse_import( $xml_url ) {
@@ -96,7 +103,7 @@ class Suki_WXR_Importer {
 		header( 'Content-Type: text/event-stream' );
 		header( 'Cache-Control: no-cache' );
 
-		// Turn off PHP output compression
+		// Turn off PHP output compression.
 		$previous = error_reporting( error_reporting() ^ E_WARNING );
 		ini_set( 'output_buffering', 'off' );
 		ini_set( 'zlib.output_compression', false );
@@ -118,10 +125,12 @@ class Suki_WXR_Importer {
 
 		if ( empty( $xml_url ) ) {
 			// Send error message.
-			$this->emit_sse_message( array(
-				'action' => 'complete',
-				'error'  => esc_html__( 'Invalid uploaded XML file URL used.', 'suki-sites-import' ),
-			) );
+			$this->emit_sse_message(
+				array(
+					'action' => 'complete',
+					'error'  => esc_html__( 'Invalid uploaded XML file URL used.', 'suki-sites-import' ),
+				)
+			);
 
 			exit;
 		}
@@ -130,11 +139,14 @@ class Suki_WXR_Importer {
 		 * Prepare the importer
 		 */
 
-		$importer = new WXR_Importer( array(
-			'update_attachment_guids' => true,
-			'fetch_attachments' => true,
-			'default_author'    => get_current_user_id(),
-		) );
+		$importer = new WXR_Importer(
+			array(
+				'update_attachment_guids' => true,
+				'fetch_attachments'       => true,
+				'default_author'          => get_current_user_id(),
+			)
+		);
+
 		$logger = new WP_Importer_Logger_ServerSentEvents();
 		$importer->set_logger( $logger );
 
@@ -150,15 +162,17 @@ class Suki_WXR_Importer {
 		 */
 
 		$info = $importer->get_preliminary_information( $xml_url );
-		$this->emit_sse_message( array(
-			'action' => 'setCounts',
-			'counts' => array(
-				'posts'    => $info->post_count,
-				'media'    => $info->media_count,
-				'comments' => $info->comment_count,
-				'terms'    => $info->term_count,
-			),
-		) );
+		$this->emit_sse_message(
+			array(
+				'action' => 'setCounts',
+				'counts' => array(
+					'posts'    => $info->post_count,
+					'media'    => $info->media_count,
+					'comments' => $info->comment_count,
+					'terms'    => $info->term_count,
+				),
+			)
+		);
 
 		/**
 		 * Begin import.
@@ -175,12 +189,21 @@ class Suki_WXR_Importer {
 		 */
 
 		// Send return value via SSE message.
-		$this->emit_sse_message( array(
-			'action' => 'complete',
-			'error'  => is_wp_error( $response ) ? $response->get_error_message() : false,
-		) );
+		$this->emit_sse_message(
+			array(
+				'action' => 'complete',
+				'error'  => is_wp_error( $response ) ? $response->get_error_message() : false,
+			)
+		);
 	}
 
+	/**
+	 * Skip GUID field.
+	 *
+	 * @param array $postdata Post data.
+	 * @param array $data Data.
+	 * @return array
+	 */
 	public function replace_guid( $postdata, $data ) {
 		// Skip GUID field which point to the https://demo.sukiwp.com.
 		$postdata['guid'] = '';
@@ -195,12 +218,12 @@ class Suki_WXR_Importer {
 	 * @param mixed $data Data to be JSON-encoded and sent in the message.
 	 */
 	public function emit_sse_message( $data ) {
-		echo "event: message" . "\n";
+		echo 'event: message' . "\n";
 		echo 'data: ' . wp_json_encode( $data ) . "\n\n";
 
 		// Extra padding.
 		echo esc_html( ':' . str_repeat( ' ', 2048 ) . "\n\n" );
-		
+
 		ob_flush();
 		flush();
 	}

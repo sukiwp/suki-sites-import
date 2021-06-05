@@ -2,12 +2,17 @@
 /**
  * Plugin compatibility: WooCommerce
  *
- * @package Suki
+ * @package Suki Sites Import
  */
 
 // Prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
+/**
+ * WooCommerce Compatibility Class
+ */
 class Suki_Sites_Import_Compatibility_WooCommerce {
 
 	/**
@@ -48,7 +53,7 @@ class Suki_Sites_Import_Compatibility_WooCommerce {
 		// Create product attributes before importing contents.
 		add_action( 'suki/sites_import/prepare_import', array( $this, 'import_product_attributes' ) );
 	}
-	
+
 	/**
 	 * ====================================================
 	 * Hook functions
@@ -58,7 +63,7 @@ class Suki_Sites_Import_Compatibility_WooCommerce {
 	/**
 	 * Import product attributes to proper table.
 	 *
-	 * @param array $data
+	 * @param array $data Data array.
 	 */
 	public function import_product_attributes( $data ) {
 		/**
@@ -70,11 +75,11 @@ class Suki_Sites_Import_Compatibility_WooCommerce {
 			wp_send_json_error();
 		}
 
-		// Get JSON data from options.json
+		// Get JSON data from options.json.
 		$raw = wp_remote_get( wp_unslash( $data['options_json_file_url'] ) );
 
 		// Abort if customizer.json response code is not successful.
-		if ( 200 != wp_remote_retrieve_response_code( $raw ) ) {
+		if ( 200 !== wp_remote_retrieve_response_code( $raw ) ) {
 			wp_send_json_error();
 		}
 
