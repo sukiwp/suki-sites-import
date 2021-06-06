@@ -14,31 +14,28 @@ const config = {
 		js: [ './assets/js/**/*.js', '!./assets/js/vendors/*' ],
 		pot: [ './**/*.php', '!./__build/**/*.php', '!./__bak/**/*.php' ],
 		build: [
-			'./*',
-			'./assets/css/**/*',
-			'./assets/icons/**/*',
-			'./assets/images/**/*',
-			'./assets/js/**/*',
-			'./includes/**/*',
-			'./languages/**/*',
-			'./page-templates/**/*',
-			'./template-parts/**/*',
+			'./**/*',
 
-			// exclude files and folders
+			// Exclude OS files
 			'!**/Thumbs.db',
 			'!**/.DS_Store',
+			'!./.DS_Store',
+
+			// Exclude SCSS files
+			'!**/scss/**',
+
+			// Exclude development folders and files
 			'!./.gitignore',
 			'!./composer.json',
 			'!./composer.lock',
-			'!./vendor',
+			'!./vendor/**',
 			'!./package*.json',
-			'!./node_modules',
+			'!./node_modules/**',
 			'!./gulpfile.js',
+			'!./*phpcs.xml*',
 			'!./README.md',
 			'!./LICENSE.md',
-			'!./*phpcs.xml*',
-			'!./__build',
-			'!./__bak',
+			'!./__**/**',
 		],
 	},
 	dest: {
