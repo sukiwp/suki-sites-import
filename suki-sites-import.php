@@ -27,5 +27,5 @@ define( 'SUKI_SITES_IMPORT_URI', plugins_url( '/', __FILE__ ) );
 define( 'SUKI_SITES_IMPORT_INCLUDES_DIR', SUKI_SITES_IMPORT_DIR . '/includes' );
 
 if ( is_admin() ) {
-	require_once SUKI_SITES_IMPORT_DIR . 'includes/class-suki-sites-import.php';
+	require_once trailingslashit( SUKI_SITES_IMPORT_INCLUDES_DIR ) . 'class-suki-sites-import.php';
 }
