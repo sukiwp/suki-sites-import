@@ -186,6 +186,8 @@ class Suki_Sites_Import {
 			$suffix = SCRIPT_DEBUG ? '' : '.min';
 
 			wp_enqueue_style( 'suki-sites-import', SUKI_SITES_IMPORT_URI . 'assets/css/sites-import' . $suffix . '.css', array(), SUKI_SITES_IMPORT_VERSION );
+			wp_style_add_data( 'suki-sites-import', 'rtl', 'replace' );
+			wp_style_add_data( 'suki-sites-import', 'suffix', $suffix );
 
 			wp_enqueue_script( 'suki-sites-import', SUKI_SITES_IMPORT_URI . 'assets/js/sites-import' . $suffix . '.js', array( 'jquery', 'wp-util', 'updates' ), SUKI_SITES_IMPORT_VERSION, true );
 			wp_localize_script(

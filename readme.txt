@@ -1,10 +1,10 @@
 === Suki Sites Import ===
 Contributors: sukiwp, daviedr
 Tags: 
-Requires at least: 4.6
+Requires at least: 5.0
 Tested up to: 5.7
+Requires PHP: 5.6
 Stable tag: 1.2.0
-Requires PHP: 5.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 

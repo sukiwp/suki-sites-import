@@ -7,7 +7,7 @@
 const info = require( './package.json' );
 
 const config = {
-	init: './' + info.name + '.php',
+	init: info.data.initFile,
 	src: {
 		scss: [ './assets/scss/**/*.scss' ],
 		css: [ './assets/css/**/*.css', '!./assets/css/vendors/*' ],
@@ -58,12 +58,12 @@ const gulp          = require( 'gulp' );
 // CSS
 const sass          = require( 'gulp-sass' );
 const autoprefixer  = require( 'gulp-autoprefixer' );
-const uglifycss     = require( 'gulp-uglifycss' );
+const cleanCSS      = require( 'gulp-clean-css' );
 const mmq           = require( 'gulp-merge-media-queries' );
 const rtlcss        = require( 'gulp-rtlcss' );
 
 // JS
-const uglify        = require( 'gulp-uglify' );
+const terser        = require( 'gulp-terser' );
 
 // Translation
 const wpPot         = require( 'gulp-wp-pot' );
@@ -77,21 +77,23 @@ const watch         = require( 'gulp-watch' );
 const zip           = require( 'gulp-zip' );
 
 /**
- * Task: Change theme info (style.css file header) based on package.json values.
+ * Task: Change plugin / theme info on init file based on package.json values.
  */
-gulp.task( 'plugin_info', function() {
+gulp.task( 'init_file', function() {
 	var info = JSON.parse( fs.readFileSync( './package.json' ) );
 
-	// Change plugin / theme info
 	return gulp.src( [ config.init ] )
 		.pipe( replace( new RegExp( '((?:Plugin|Theme) Name: ).*' ), '$1' + info.title ) )
 		.pipe( replace( new RegExp( '((?:Plugin|Theme) URI: ).*' ), '$1' + info.uri ) )
-		.pipe( replace( new RegExp( '(Description: ).*' ), '$1' + info.description ) )
-		.pipe( replace( new RegExp( '(Version: ).*' ), '$1' + info.version ) )
 		.pipe( replace( new RegExp( '(Author: ).*' ), '$1' + info.author.name ) )
 		.pipe( replace( new RegExp( '(Author URI: ).*' ), '$1' + info.author.url ) )
-		.pipe( replace( new RegExp( '(Text Domain: ).*' ), '$1' + info.name ) )
+		.pipe( replace( new RegExp( '(Description: ).*' ), '$1' + info.description ) )
+		.pipe( replace( new RegExp( '(Version: ).*' ), '$1' + info.version ) )
+		.pipe( replace( new RegExp( '(Requires at least: ).*' ), '$1' + info.data.requiresWPVersion ) )
+		.pipe( replace( new RegExp( '(Tested up to: ).*' ), '$1' + info.data.testedWPVersion ) )
+		.pipe( replace( new RegExp( '(Requires PHP: ).*' ), '$1' + info.data.requiresPHPVersion ) )
 		.pipe( replace( new RegExp( '(Tags: ).*' ), '$1' + info.keywords.join( ', ' ) ) )
+		.pipe( replace( new RegExp( '(Text Domain: ).*' ), '$1' + info.name ) )
 
 		.pipe( replace( new RegExp( '(\'' + info.name.toUpperCase().split( '-' ).join( '_' ) + '_VERSION\', \').*?(\'.*)' ), '$1' + info.version + '$2' ) )
 
@@ -99,25 +101,25 @@ gulp.task( 'plugin_info', function() {
 } );
 
 /**
- * Task: Change info on readme.txt based on package.json values.
+ * Task: Change plugin / theme info on readme.txt based on package.json values.
  */
-gulp.task( 'readme_txt', function() {
+gulp.task( 'readme_file', function() {
 	var info = JSON.parse( fs.readFileSync( './package.json' ) );
 
 	var contributors = info.contributors.map(function( contributor ) {
 		return contributor.name;
 	});
 
-	// Change theme version on eadme.txt
 	return gulp.src( [ './readme.txt' ] )
-		.pipe( replace( /(===).*(===)/, '$1 ' + info.title + ' $2' ) )
-		.pipe( replace( /(Contributors: ).*/, '$1' + contributors.join( ', ' ) ) )
-		.pipe( replace( /(Tags: ).*/, '$1' + info.keywords.join( ', ' ) ) )
-		.pipe( replace( /(Stable tag: ).*/, '$1' + info.version ) )
+		.pipe( replace( new RegExp( '(===).*(===)' ), '$1 ' + info.title + ' $2' ) )
+		.pipe( replace( new RegExp( '(Contributors: ).*' ), '$1' + contributors.join( ', ' ) ) )
+		.pipe( replace( new RegExp( '(Stable tag: ).*' ), '$1' + info.version ) )
+		.pipe( replace( new RegExp( '(Requires at least: ).*' ), '$1' + info.data.requiresWPVersion ) )
+		.pipe( replace( new RegExp( '(Tested up to: ).*' ), '$1' + info.data.testedWPVersion ) )
+		.pipe( replace( new RegExp( '(Requires PHP: ).*' ), '$1' + info.data.requiresPHPVersion ) )
+		.pipe( replace( new RegExp( '(Tags: ).*' ), '$1' + info.keywords.join( ', ' ) ) )
 
-		.pipe( replace( /(\s\s).*(\s\s== Description ==)/, '$1' + info.description + '$2' ) )
-
-		// .pipe( replace( /(== Description ==\s\s).*(\s\s)/, '$1' + info.description + '$2' ) )
+		.pipe( replace( new RegExp( '(\s\s).*(\s\s== Description ==)' ), '$1' + info.description + '$2' ) )
 
 		.pipe( gulp.dest( './' ) );
 } );
@@ -125,7 +127,7 @@ gulp.task( 'readme_txt', function() {
 /**
  * Wrapper Task: Set theme info files.
  */
-gulp.task( 'info', gulp.series( 'plugin_info', 'readme_txt' ) );
+gulp.task( 'info', gulp.series( 'init_file', 'readme_file' ) );
 
 /**
  * Task: Convert SASS to CSS files.
@@ -143,23 +145,10 @@ gulp.task( 'css_sass', function() {
 } );
 
 /**
- * Task: Minify CSS files.
- */
-gulp.task( 'css_min', function() {
-	var src = config.src.css.concat( [ '!./assets/css/**/*.min.css', '!./assets/css/**/*-rtl.css' ] );
-
-	return gulp.src( src )
-		.pipe( mmq() )
-		.pipe( uglifycss() )
-		.pipe( rename( { suffix: '.min' } ) )
-		.pipe( gulp.dest( config.dest.css ) );
-} );
-
-/**
  * Task: Make RTL CSS files.
  */
 gulp.task( 'css_rtl', function() {
-	var src = config.src.css.concat( [ '!./assets/css/**/*-rtl.css' ] );
+	var src = config.src.css.concat( [ '!./assets/css/**/*.min.css', '!./assets/css/**/*-rtl.css' ] );
 
 	return gulp.src( src )
 		.pipe( rtlcss() )
@@ -168,9 +157,22 @@ gulp.task( 'css_rtl', function() {
 } );
 
 /**
+ * Task: Minify CSS files.
+ */
+gulp.task( 'css_min', function() {
+	var src = config.src.css.concat( [ '!./assets/css/**/*.min.css' ] );
+
+	return gulp.src( src )
+		.pipe( mmq() )
+		.pipe( cleanCSS() )
+		.pipe( rename( { suffix: '.min' } ) )
+		.pipe( gulp.dest( config.dest.css ) );
+} );
+
+/**
  * Task: Run group of tasks regarding CSS files in sequence.
  */
-gulp.task( 'css', gulp.series( 'css_sass', 'css_min', 'css_rtl' ) );
+gulp.task( 'css', gulp.series( 'css_sass', 'css_rtl', 'css_min' ) );
 
 /**
  * Task: Minify JS files.
@@ -179,7 +181,7 @@ gulp.task( 'js', function() {
 	var src = config.src.js.concat( [ '!./assets/js/**/*.min.js' ] );
 
 	return gulp.src( src )
-		.pipe( uglify().on( 'error', function( error ) {
+		.pipe( terser().on( 'error', function( error ) {
 			console.error( error ); 
 			this.emit( 'end' ); 
 		} ) )
@@ -197,7 +199,7 @@ gulp.task( 'pot', function() {
 		.pipe( wpPot( {
 			domain: info.name,
 			package: info.title,
-			metadataFile: info.name + '.php',
+			metadataFile: config.init,
 		} ).on( 'error', function( error ) {
 			console.error( error );
 			this.emit( 'end' );
