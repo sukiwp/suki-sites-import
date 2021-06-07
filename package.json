@@ -46,7 +46,7 @@
 	],
 	"dependencies": {},
 	"data": {
-		"initFile": "./suki-sites-import.php",
+		"initFile": "suki-sites-import.php",
 		"requiresWPVersion": "5.0",
 		"testedWPVersion": "5.7",
 		"requiresPHPVersion": "5.6"
