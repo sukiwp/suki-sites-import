@@ -13,8 +13,24 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: includes/class-suki-sites-import.php:171
+#: suki-sites-import.php:3, includes/class-suki-sites-import.php:171
 msgid "Suki Sites Import"
+msgstr ""
+
+#: suki-sites-import.php:4
+msgid "http://wordpress.org/plugins/suki-sites-import"
+msgstr ""
+
+#: suki-sites-import.php:5
+msgid "Collection of ready-to-use templates (demo sites) built for Elementor and Gutenberg."
+msgstr ""
+
+#: suki-sites-import.php:7
+msgid "Suki WordPress Theme"
+msgstr ""
+
+#: suki-sites-import.php:8
+msgid "https://sukiwp.com/#about"
 msgstr ""
 
 #: includes/class-suki-sites-import.php:172
