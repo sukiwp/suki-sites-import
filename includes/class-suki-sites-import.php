@@ -149,9 +149,9 @@ class Suki_Sites_Import {
 	 * Filters the "real" file type of the given file.
 	 *
 	 * @param array  $wp_check_filetype_and_ext File info.
-	 * @param string $file File.
-	 * @param string $filename File name.
-	 * @param array  $mimes MIME types.
+	 * @param string $file                      File.
+	 * @param string $filename                  File name.
+	 * @param array  $mimes                     MIME types.
 	 * @return array
 	 */
 	public function real_mime_type_for_xml( $wp_check_filetype_and_ext, $file, $filename, $mimes ) {

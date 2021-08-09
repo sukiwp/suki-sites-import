@@ -201,7 +201,7 @@ class Suki_WXR_Importer {
 	 * Skip GUID field.
 	 *
 	 * @param array $postdata Post data.
-	 * @param array $data Data.
+	 * @param array $data     Data.
 	 * @return array
 	 */
 	public function replace_guid( $postdata, $data ) {
@@ -232,7 +232,7 @@ class Suki_WXR_Importer {
 	 * Send message when a post has been imported.
 	 *
 	 * @since 1.1.0
-	 * @param int   $id Post ID.
+	 * @param int   $id   Post ID.
 	 * @param array $data Post data saved to the DB.
 	 */
 	public function imported_post( $id, $data ) {

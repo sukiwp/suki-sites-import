@@ -19,7 +19,7 @@ if ( ! class_exists( 'WP_Importer_Logger_ServerSentEvents' ) && class_exists( 'W
 		/**
 		 * Logs with an arbitrary level.
 		 *
-		 * @param mixed  $level Log level.
+		 * @param mixed  $level   Log level.
 		 * @param string $message Log message.
 		 * @param array  $context Log context.
 		 * @return void

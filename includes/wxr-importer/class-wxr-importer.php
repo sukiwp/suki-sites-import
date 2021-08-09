@@ -162,13 +162,13 @@ class WXR_Importer extends WP_Importer {
 	 * Constructor
 	 *
 	 * @param array $options Options.
-	 *     @var bool $prefill_existing_posts Should we prefill `post_exists` calls? (True prefills and uses more memory, false checks once per imported post and takes longer. Default is true.)
+	 *     @var bool $prefill_existing_posts    Should we prefill `post_exists` calls? (True prefills and uses more memory, false checks once per imported post and takes longer. Default is true.)
 	 *     @var bool $prefill_existing_comments Should we prefill `comment_exists` calls? (True prefills and uses more memory, false checks once per imported comment and takes longer. Default is true.)
-	 *     @var bool $prefill_existing_terms Should we prefill `term_exists` calls? (True prefills and uses more memory, false checks once per imported term and takes longer. Default is true.)
-	 *     @var bool $update_attachment_guids Should attachment GUIDs be updated to the new URL? (True updates the GUID, which keeps compatibility with v1, false doesn't update, and allows deduplication and reimporting. Default is false.)
-	 *     @var bool $fetch_attachments Fetch attachments from the remote server. (True fetches and creates attachment posts, false skips attachments. Default is false.)
-	 *     @var bool $aggressive_url_search Should we search/replace for URLs aggressively? (True searches all posts' content for old URLs and replaces, false checks for `<img class="wp-image-*">` only. Default is false.)
-	 *     @var int $default_author User ID to use if author is missing or invalid. (Default is null, which leaves posts unassigned.)
+	 *     @var bool $prefill_existing_terms    Should we prefill `term_exists` calls? (True prefills and uses more memory, false checks once per imported term and takes longer. Default is true.)
+	 *     @var bool $update_attachment_guids   Should attachment GUIDs be updated to the new URL? (True updates the GUID, which keeps compatibility with v1, false doesn't update, and allows deduplication and reimporting. Default is false.)
+	 *     @var bool $fetch_attachments         Fetch attachments from the remote server. (True fetches and creates attachment posts, false skips attachments. Default is false.)
+	 *     @var bool $aggressive_url_search     Should we search/replace for URLs aggressively? (True searches all posts' content for old URLs and replaces, false checks for `<img class="wp-image-*">` only. Default is false.)
+	 *     @var int  $default_author            User ID to use if author is missing or invalid. (Default is null, which leaves posts unassigned.)
 	 * }
 	 */
 	public function __construct( $options = array() ) {
@@ -1704,8 +1704,8 @@ class WXR_Importer extends WP_Importer {
 			/**
 			 * User processing failed.
 			 *
-			 * @param WP_Error $user_id Error object.
-			 * @param array $userdata Raw data imported for the user.
+			 * @param WP_Error $user_id  Error object.
+			 * @param array    $userdata Raw data imported for the user.
 			 */
 			do_action( 'wxr_importer.process_failed.user', $user_id, $userdata ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
 			return false;
@@ -1887,8 +1887,8 @@ class WXR_Importer extends WP_Importer {
 			 * Term processing failed.
 			 *
 			 * @param WP_Error $result Error object.
-			 * @param array $data Raw data imported for the term.
-			 * @param array $meta Meta data supplied for the term.
+			 * @param array    $data   Raw data imported for the term.
+			 * @param array    $meta   Meta data supplied for the term.
 			 */
 			do_action( 'wxr_importer.process_failed.term', $result, $data, $meta ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
 			return false;
@@ -1921,8 +1921,8 @@ class WXR_Importer extends WP_Importer {
 		/**
 		 * Term processing completed.
 		 *
-		 * @param int $term_id New term ID.
-		 * @param array $data Raw data imported for the term.
+		 * @param int   $term_id New term ID.
+		 * @param array $data    Raw data imported for the term.
 		 */
 		do_action( 'wxr_importer.processed.term', $term_id, $data ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
 	}
@@ -1930,7 +1930,7 @@ class WXR_Importer extends WP_Importer {
 	/**
 	 * Attempt to download a remote file attachment
 	 *
-	 * @param string $url URL of item to fetch.
+	 * @param string $url  URL of item to fetch.
 	 * @param array  $post Attachment details.
 	 * @return array|WP_Error Local file location details on success, WP_Error otherwise.
 	 */
@@ -2339,7 +2339,7 @@ class WXR_Importer extends WP_Importer {
 	/**
 	 * Added to http_request_timeout filter to force timeout at 60 seconds during import
 	 *
-	 * @param  string $val Timeout value.
+	 * @param string $val Timeout value.
 	 * @return int 60
 	 */
 	protected function bump_request_timeout( $val ) {
@@ -2349,8 +2349,8 @@ class WXR_Importer extends WP_Importer {
 	/**
 	 * Return the difference in length between two strings.
 	 *
-	 * @param  string $a String one.
-	 * @param  string $b String two.
+	 * @param string $a String one.
+	 * @param string $b String two.
 	 * @return string
 	 */
 	protected function cmpr_strlen( $a, $b ) {
