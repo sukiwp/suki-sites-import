@@ -268,7 +268,7 @@ class Suki_Sites_Import {
 
 		$response = array();
 
-		foreach ( array_map( 'sanitize_text_field', wp_unslash( $_REQUEST['plugins'] ) ) as $i => $plugin ) {
+		foreach ( wp_unslash( $_REQUEST['plugins'] ) as $i => $plugin ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 			if ( ! file_exists( WP_PLUGIN_DIR . '/' . $plugin['path'] ) ) {
 				$response[ $i ] = 'not_installed';
 			} elseif ( is_plugin_active( $plugin['path'] ) ) {
@@ -523,26 +523,8 @@ class Suki_Sites_Import {
 		 * Successfully downloaded, now create an attachment post for the XML file.
 		 */
 
-		$post = array(
-			'post_title'     => $file_args['name'],
-			'guid'           => $download_response['url'],
-			'post_mime_type' => $download_response['type'],
-		);
-
-		// Create attachment.
-		$post_id = wp_insert_attachment( $post, $download_response['file'] );
-
-		// Error when creating attachment.
-		if ( is_wp_error( $post_id ) ) {
-			wp_send_json_error( esc_html__( 'There was an error downloading the XML file.', 'suki-sites-import' ) );
-		}
-
 		// Save currently processed XML file ID in wp_options.
-		update_option( 'suki_sites_import_xml_id', $post_id );
-
-		// Update attachment metadata.
-		$attachment_metadata = wp_generate_attachment_metadata( $post_id, $download_response['file'] );
-		wp_update_attachment_metadata( $post_id, $attachment_metadata );
+		update_option( 'suki_sites_import_xml_path', $download_response['file'] );
 
 		/**
 		 * Action hook.
@@ -570,8 +552,11 @@ class Suki_Sites_Import {
 		 * Prepare XML.
 		 */
 
-		$xml_id  = get_option( 'suki_sites_import_xml_id' );
-		$xml_url = get_attached_file( $xml_id );
+		$xml_path = get_option( 'suki_sites_import_xml_path', '' );
+
+		if ( ! file_exists( $xml_path ) ) {
+			wp_send_json_error( esc_html__( 'Invalid XML file path.', 'suki-sites-import' ) );
+		}
 
 		/**
 		 * Action hook.
@@ -583,14 +568,14 @@ class Suki_Sites_Import {
 		 * Run importer.
 		 */
 
-		Suki_WXR_Importer::instance()->sse_import( $xml_url );
+		Suki_WXR_Importer::instance()->sse_import( $xml_path );
 
 		/**
 		 * After completed
 		 */
 
 		// Clean the XML ID on database.
-		update_option( 'suki_sites_import_xml_id', 0 );
+		delete_option( 'suki_sites_import_xml_path' );
 
 		foreach ( get_terms( array( 'taxonomy' => 'nav_menu' ) ) as $menu ) {
 			foreach ( wp_get_nav_menu_items( $menu->term_id ) as $menu_item ) {
@@ -874,7 +859,7 @@ class Suki_Sites_Import {
 		 * Action hook.
 		 */
 
-		do_action( 'suki/sites_import/finalize_import', $array );
+		do_action( 'suki/sites_import/finalize_import' );
 
 		/**
 		 * Return successful AJAX.
