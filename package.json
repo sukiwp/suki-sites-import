@@ -48,7 +48,7 @@
 	"data": {
 		"initFile": "suki-sites-import.php",
 		"requiresWPVersion": "5.0",
-		"testedWPVersion": "5.7",
+		"testedWPVersion": "5.8",
 		"requiresPHPVersion": "5.6"
 	}
 }
