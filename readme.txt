@@ -4,7 +4,7 @@ Tags:
 Requires at least: 5.0
 Tested up to: 5.7
 Requires PHP: 5.6
-Stable tag: 1.2.0
+Stable tag: 1.2.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -44,6 +44,10 @@ Yes! We continuously add new demo sites in various categories and niches. You wi
 4. Go to Appearance > Sites Import to see the available demo sites.
 
 == Changelog ==
+
+= v1.2.1 =
+
+* TWEAK: Improve contents XML file upload (do not upload it as attachment).
 
 = v1.2.0 =
 
