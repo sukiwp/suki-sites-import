@@ -2342,7 +2342,7 @@ class WXR_Importer extends WP_Importer {
 	 * @param string $val Timeout value.
 	 * @return int 60
 	 */
-	protected function bump_request_timeout( $val ) {
+	public function bump_request_timeout( $val ) {
 		return 60;
 	}
 
@@ -2353,7 +2353,7 @@ class WXR_Importer extends WP_Importer {
 	 * @param string $b String two.
 	 * @return string
 	 */
-	protected function cmpr_strlen( $a, $b ) {
+	public function cmpr_strlen( $a, $b ) {
 		return strlen( $b ) - strlen( $a );
 	}
 
