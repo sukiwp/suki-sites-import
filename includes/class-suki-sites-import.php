@@ -368,7 +368,7 @@ class Suki_Sites_Import {
 		 */
 
 		$data = wp_parse_args(
-			array_map( 'sanitize_text_field', wp_unslash( $_REQUEST['info'] ) ),
+			wp_unslash( $_REQUEST['info'] ), // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 			array(
 				'slug'                     => '',
 				'required_plugins'         => '',

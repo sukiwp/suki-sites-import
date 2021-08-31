@@ -150,103 +150,103 @@ msgstr ""
 msgid "Invalid XML file path."
 msgstr ""
 
-#: includes/class-suki-sites-import.php:602
+#: includes/class-suki-sites-import.php:604
 msgid "You are not permitted to import customizer."
 msgstr ""
 
-#: includes/class-suki-sites-import.php:608
+#: includes/class-suki-sites-import.php:610
 msgid "No customizer JSON file specified."
 msgstr ""
 
-#: includes/class-suki-sites-import.php:661
+#: includes/class-suki-sites-import.php:663
 msgid "You are not permitted to import widgets."
 msgstr ""
 
-#: includes/class-suki-sites-import.php:667
+#: includes/class-suki-sites-import.php:669
 msgid "No widgets JSON file specified."
 msgstr ""
 
-#: includes/class-suki-sites-import.php:784
+#: includes/class-suki-sites-import.php:786
 msgid "You are not permitted to import options."
 msgstr ""
 
-#: includes/class-suki-sites-import.php:790
+#: includes/class-suki-sites-import.php:792
 msgid "No options JSON file specified."
 msgstr ""
 
-#: includes/class-suki-sites-import.php:883
+#: includes/class-suki-sites-import.php:885
 msgid "Suki Sites Import (plugin) requires Suki theme to be installed and activated."
 msgstr ""
 
-#: includes/class-suki-sites-import.php:891
+#: includes/class-suki-sites-import.php:893
 msgid "Install and Activate Now"
 msgstr ""
 
-#: includes/class-suki-sites-import.php:888
+#: includes/class-suki-sites-import.php:890
 msgid "Activate Now"
 msgstr ""
 
-#: includes/class-suki-sites-import.php:932
+#: includes/class-suki-sites-import.php:934
 msgid "Show All"
 msgstr ""
 
-#: includes/class-suki-sites-import.php:938
+#: includes/class-suki-sites-import.php:940
 msgid "Search site sites"
 msgstr ""
 
-#: includes/class-suki-sites-import.php:939
+#: includes/class-suki-sites-import.php:941
 msgid "or enter keywords..."
 msgstr ""
 
-#: includes/class-suki-sites-import.php:951
+#: includes/class-suki-sites-import.php:953
 msgid "Details & Preview"
 msgstr ""
 
-#: includes/class-suki-sites-import.php:953
+#: includes/class-suki-sites-import.php:955
 msgid "Pro"
 msgstr ""
 
-#: includes/class-suki-sites-import.php:961
+#: includes/class-suki-sites-import.php:963
 msgid "Select your page builder."
 msgstr ""
 
-#: includes/class-suki-sites-import.php:966
+#: includes/class-suki-sites-import.php:968
 msgid "No site found. Try a different search."
 msgstr ""
 
-#: includes/class-suki-sites-import.php:974
+#: includes/class-suki-sites-import.php:976
 msgid "Close"
 msgstr ""
 
-#: includes/class-suki-sites-import.php:987
+#: includes/class-suki-sites-import.php:989
 msgid "Pro Demo Site"
 msgstr ""
 
-#: includes/class-suki-sites-import.php:988
+#: includes/class-suki-sites-import.php:990
 msgid "To import this demo site you need an active license of {{ data.license_plan.name }} plan. Please upgrade or renew your license first."
 msgstr ""
 
-#: includes/class-suki-sites-import.php:989
+#: includes/class-suki-sites-import.php:991
 msgid "If you already have an active license, please install the Suki Pro plugin and activate your license on \"Appearance > Suki\" page."
 msgstr ""
 
-#: includes/class-suki-sites-import.php:997
+#: includes/class-suki-sites-import.php:999
 msgid "Make sure you disable the \"debug\" mode because it may disrupt the import process."
 msgstr ""
 
-#: includes/class-suki-sites-import.php:998
+#: includes/class-suki-sites-import.php:1000
 msgid "Learn how to disable debug mode"
 msgstr ""
 
-#: includes/class-suki-sites-import.php:1005
+#: includes/class-suki-sites-import.php:1007
 msgid "Required Plugins"
 msgstr ""
 
-#: includes/class-suki-sites-import.php:1035
+#: includes/class-suki-sites-import.php:1037
 msgid "Preview"
 msgstr ""
 
-#: includes/class-suki-sites-import.php:1044
+#: includes/class-suki-sites-import.php:1046
 msgid "Load More"
 msgstr ""
 
